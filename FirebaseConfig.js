@@ -1,5 +1,5 @@
-// @ts-ignore
-import firebase from 'firebase';
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore/lite';
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -11,8 +11,7 @@ const config = {
   measurementId: process.env.REACT_APP_MEASUREMENT_ID,
 };
 
-if (!firebase.apps.length) {
-  firebase.initializaApp(config);
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-export default firebase;
+export default db;
