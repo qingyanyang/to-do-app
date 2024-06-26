@@ -1,0 +1,18 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+ "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // Runs Prettier, then ESLint
+  "editor.codeActionsOnSave": [
+    "source.formatDocument",
+    "source.fixAll.eslint"
+  ],
+  "appService.defaultWebAppToDeploy": "/subscriptions/597642ec-99b2-45b9-a27d-de2eb7c603ca/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/react-ui-demo",
+  "appService.deploySubpath": "build"
+}
