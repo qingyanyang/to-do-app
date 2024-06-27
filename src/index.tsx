@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import '@radix-ui/themes/styles.css';
 import App from './App';
-import { Theme, ThemePanel } from '@radix-ui/themes';
+import { Theme } from '@radix-ui/themes';
 
 // import firebase from '../FirebaseConfig';
 
