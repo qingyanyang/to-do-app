@@ -22,7 +22,6 @@ root.render(
       radius='full'
     >
       <App />
-      <ThemePanel />
     </Theme>
   </React.StrictMode>,
 );
