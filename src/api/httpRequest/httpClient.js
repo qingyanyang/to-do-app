@@ -3,7 +3,7 @@ import webConfig from '@/global.config.js';
 import { md5 } from 'js-md5';
 
 const request = axios.create({
-  baseURL: process.env.BASE_URL,
+  baseURL: process.env.REACT_APP_API_URL,
   timeout: 30 * 1000,
   responseType: 'json',
   headers: {
