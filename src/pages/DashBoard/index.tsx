@@ -2,6 +2,11 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import React from 'react';
 import { Button } from '@radix-ui/themes';
 import { FirebaseAuthService } from '../../api/firebaseService/auth';
+import {
+  removeEmail,
+  removeProfileURL,
+  removeToken,
+} from '../../util/localStorageFucs';
 
 function DashBoard() {
   const navigate = useNavigate();
@@ -9,6 +14,11 @@ function DashBoard() {
     console.log('logout');
     try {
       await FirebaseAuthService.logoutUser();
+      // clear storage
+      removeEmail();
+      removeToken();
+      removeProfileURL();
+      //redirect
       navigate('/login');
     } catch (error) {
       alert(error);

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import NotFound from './pages/NotFoundPage';
 import DashBoard from './pages/DashBoard';
 import TodayTasks from './pages/DashBoard/TodayTasks';
@@ -6,31 +6,40 @@ import ScheduledTasks from './pages/DashBoard/ScheduledTasks';
 import PreferencesTasks from './pages/DashBoard/PreferencesTasks';
 import Settings from './pages/DashBoard/Settings';
 import Login from './pages/Login';
-// import { FirebaseAuthService } from './api/firebaseService/auth';
+import { ReactNode } from 'react';
+import { getToken } from './util/localStorageFucs';
 
-// type AuthRouteProps = {
-//   children: ReactNode;
-// };
+type AuthRouteProps = {
+  children: ReactNode;
+};
 
-// const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
-//   const [user, setUser] = useState(null);
+const AuthRoute: React.FC<AuthRouteProps> = ({ children }) => {
+  // automatically login
+  const token = getToken();
+  if (token) {
+    return <>{children}</>;
+  } else {
+    return <Navigate to={'/login'}></Navigate>;
+  }
+};
 
-//   FirebaseAuthService.subscribeToAuthChanges(setUser);
-
-//   if (user) {
-//     return <>{children}</>;
-//   } else {
-//     return <Navigate to={'/login'}></Navigate>;
-//   }
-// };
+const ContentRoute: React.FC<AuthRouteProps> = ({ children }) => {
+  // automatically login
+  const token = getToken();
+  if (token) {
+    return <Navigate to={'/'}></Navigate>;
+  } else {
+    return <>{children}</>;
+  }
+};
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      // <AuthRoute>
-      <DashBoard />
-      // </AuthRoute>
+      <AuthRoute>
+        <DashBoard />
+      </AuthRoute>
     ),
     children: [
       {
@@ -53,7 +62,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <Login />,
+    element: (
+      <ContentRoute>
+        <Login />
+      </ContentRoute>
+    ),
   },
   {
     path: '*',

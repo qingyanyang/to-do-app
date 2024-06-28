@@ -19,6 +19,7 @@ import {
 import React, { useState, ReactNode } from 'react';
 import { FirebaseAuthService } from '../../api/firebaseService/auth';
 import { useNavigate } from 'react-router-dom';
+import { setProfileURL, setToken } from '../../util/localStorageFucs';
 
 interface TodoInputProps {
   label: string;
@@ -113,11 +114,20 @@ function Login() {
     const passwordErrorMSG = handleValidatePassword();
     //validations
     if (!emailErrorMSG && !passwordErrorMSG) {
-      console.log('login');
       try {
-        await FirebaseAuthService.loginUser(email, password);
+        const res = await FirebaseAuthService.loginUser(email, password);
         setEmail('');
         setPassword('');
+        // save info
+        const accessToken = await res.user.getIdToken();
+        setToken(accessToken);
+        setEmail(res.user.email ? res.user.email : '');
+        setProfileURL(
+          res.user.providerData[0].photoURL
+            ? res.user.providerData[0].photoURL
+            : '',
+        );
+        // redirect
         navigate('/');
       } catch (error) {
         alert(error);
@@ -126,9 +136,18 @@ function Login() {
   };
 
   const handleLoginWithGoogle = async () => {
-    console.log('login with google');
     try {
-      await FirebaseAuthService.loginWithGoogle();
+      const res = await FirebaseAuthService.loginWithGoogle();
+      // save info
+      const accessToken = await res.user.getIdToken();
+      setToken(accessToken);
+      setEmail(res.user.email ? res.user.email : '');
+      setProfileURL(
+        res.user.providerData[0].photoURL
+          ? res.user.providerData[0].photoURL
+          : '',
+      );
+      // redirect
       navigate('/');
     } catch (error) {
       alert(error);
@@ -249,6 +268,7 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        handleSwitch(0);
       } catch (error) {
         alert(error);
       }
