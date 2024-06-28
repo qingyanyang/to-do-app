@@ -7,9 +7,7 @@ import { Theme } from '@radix-ui/themes';
 
 // import firebase from '../FirebaseConfig';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement,
-);
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>

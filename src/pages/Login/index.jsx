@@ -2,6 +2,11 @@ import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EyeClosedIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import {
+  validateEmail,
+  validatePassword,
+  validateConfirmPassword,
+} from '../../util/validations';
+import {
   Box,
   Card,
   Flex,
@@ -11,24 +16,19 @@ import {
   Link,
   IconButton,
 } from '@radix-ui/themes';
-import React, { useState, ReactNode } from 'react';
+import React, { useState } from 'react';
 
-type TodoInputProps = {
-  label: string;
-  instruction?: string;
-  placeholder: string;
-  isPassword?: boolean;
-  preffixIcon?: ReactNode;
-  actions?: ReactNode;
-};
-
-const TodoInput: React.FC<TodoInputProps> = ({
+const TodoInput = ({
   label,
   instruction = '',
   placeholder,
   isPassword = false,
   preffixIcon,
   actions = null,
+  value,
+  onChange,
+  onBlur,
+  error,
 }) => {
   return (
     <Flex direction='column' gap='1'>
@@ -41,6 +41,9 @@ const TodoInput: React.FC<TodoInputProps> = ({
         </Link>
       </Flex>
       <TextField.Root
+        onBlur={onBlur}
+        onChange={onChange}
+        value={value}
         radius='large'
         size='2'
         placeholder={placeholder}
@@ -55,6 +58,13 @@ const TodoInput: React.FC<TodoInputProps> = ({
           {actions}
         </TextField.Slot>
       </TextField.Root>
+      {error ? (
+        <Text color='red' size='1'>
+          {error}
+        </Text>
+      ) : (
+        <Box height='16px'></Box>
+      )}
     </Flex>
   );
 };
@@ -62,10 +72,32 @@ const TodoInput: React.FC<TodoInputProps> = ({
 function Login() {
   const [isLogin, setIsLogin] = useState(true);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailErrorMSG, setEmailErrorMSG] = useState('');
+  const [passwordErrorMSG, setPasswordErrorMSG] = useState('');
 
   const switchPage = () => {
     setIsLogin(!isLogin);
   };
+
+  const handleValidateEmail = () => {
+    const errMSG = validateEmail(email);
+    setEmailErrorMSG(errMSG);
+  };
+
+  const handleValidatePassword = () => {
+    const errMSG = validatePassword(password);
+    setPasswordErrorMSG(errMSG);
+  };
+
+  const handleLogin = () => {
+    //validations
+    if (!emailErrorMSG && !passwordErrorMSG) {
+      console.log('login');
+    }
+  };
+
   return (
     <Flex
       align='center'
@@ -76,13 +108,24 @@ function Login() {
       {isLogin ? (
         <Box className='mobile:w-[350px] tablet:w-[400px]'>
           <Card size='3'>
-            <Flex direction='column' gap='5'>
+            <Flex direction='column' gap='4'>
               <Text className='text-primary-invert font-bold text-2xl'>
                 Sign in
               </Text>
-              <Flex direction='column' gap='4'>
-                <TodoInput label={'Email'} placeholder='enter your email' />
+              <Flex direction='column' gap='1'>
                 <TodoInput
+                  error={emailErrorMSG}
+                  onBlur={handleValidateEmail}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  label={'Email'}
+                  placeholder='enter your email'
+                />
+                <TodoInput
+                  error={passwordErrorMSG}
+                  onBlur={handleValidatePassword}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   label={'Password'}
                   instruction='Forgot Password?'
                   placeholder='enter your password'
@@ -97,12 +140,11 @@ function Login() {
                   }
                 />
               </Flex>
-
               <Flex justify='end' gap='3' align={'center'}>
                 <Button variant='surface' onClick={switchPage}>
                   Create an account
                 </Button>
-                <Button>Sign in</Button>
+                <Button onClick={handleLogin}>Sign in</Button>
                 <Button>
                   <FontAwesomeIcon icon={faGoogle} />
                 </Button>
@@ -117,13 +159,31 @@ function Login() {
   );
 }
 
-type SignUpProps = {
-  handleSwitch: () => void;
-};
-const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
+const SignUp = ({ handleSwitch }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [emailErrorMSG, setEmailErrorMSG] = useState('');
+  const [passwordErrorMSG, setPasswordErrorMSG] = useState('');
+  const [passwordConfirmErrorMSG, setPasswordConfirmErrorMSG] = useState('');
+
+  const handleValidateEmail = () => {
+    const errMSG = validateEmail(email);
+    setEmailErrorMSG(errMSG);
+  };
+
+  const handleValidatePassword = () => {
+    const errMSG = validatePassword(password);
+    setPasswordErrorMSG(errMSG);
+  };
+
+  const handleValidateConfirmPassword = () => {
+    const errMSG = validateConfirmPassword(password, confirmPassword);
+    setPasswordConfirmErrorMSG(errMSG);
+  };
 
   return (
     <Flex
@@ -138,9 +198,20 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
             <Text className='text-primary-invert font-bold text-2xl'>
               Sign up
             </Text>
-            <Flex direction='column' gap='3'>
-              <TodoInput label={'Email'} placeholder='set your email' />
+            <Flex direction='column' gap='1'>
               <TodoInput
+                error={emailErrorMSG}
+                onBlur={handleValidateEmail}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                label={'Email'}
+                placeholder='set your email'
+              />
+              <TodoInput
+                error={passwordErrorMSG}
+                onBlur={handleValidatePassword}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 label={'Password'}
                 placeholder='set your password'
                 isPassword={!isPasswordVisible}
@@ -154,6 +225,10 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
                 }
               />
               <TodoInput
+                error={passwordConfirmErrorMSG}
+                onBlur={handleValidateConfirmPassword}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 label={'Confirm Password'}
                 placeholder='confirm your password'
                 isPassword={!isConfirmPasswordVisible}
