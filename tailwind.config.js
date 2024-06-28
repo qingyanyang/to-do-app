@@ -18,7 +18,7 @@ export default {
       secondary: '#525252',
       tertiary: '#737373',
       brand: {
-        DEFAULT: '#4338ca',
+        DEFAULT: '#c5e47c',
         hover: '#3730a3',
       },
       disabled: {
@@ -58,7 +58,7 @@ export default {
       brand: {
         primary: {
           DEFAULT: '#4338ca',
-          emphasize: '#3730a3',
+          emphasize: '#212919',
         },
         subtle: '#eff1fc',
       },
@@ -132,14 +132,14 @@ export default {
       secondary: '#9ca3af',
       success: '#bbf7d0',
       brand: {
-        DEFAULT: '#c7d2fe',
+        DEFAULT: '#c7ed77',
         light: '#eef2ff',
         emphasize: '#4338ca',
       },
       transparent: 'transparent',
       error: '#fecaca',
       warning: '#fde68a',
-      neutral: '#e5e5e5',
+      neutral: '#2d2f2e',
     },
     borderRadius: {
       none: '0',

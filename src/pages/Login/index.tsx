@@ -209,7 +209,7 @@ function Login() {
                   Create an account
                 </Button>
                 <Button onClick={handleLogin}>Sign in</Button>
-                <Button onClick={handleLoginWithGoogle}>
+                <Button variant='soft' onClick={handleLoginWithGoogle}>
                   <FontAwesomeIcon icon={faGoogle} />
                 </Button>
               </Flex>
