@@ -1,4 +1,4 @@
-import { firebaseAuth } from '../../FirebaseConfig';
+import { auth as firebaseAuth } from '../../FirebaseConfig';
 
 import {
   createUserWithEmailAndPassword,
@@ -10,11 +10,11 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 
-const registerUser = async (email, password) => {
+const registerUser = async (email: string, password: string) => {
   return await createUserWithEmailAndPassword(firebaseAuth, email, password);
 };
 
-const loginUser = async (email, password) => {
+const loginUser = async (email: string, password: string) => {
   return await signInWithEmailAndPassword(firebaseAuth, email, password);
 };
 
@@ -22,7 +22,7 @@ const logoutUser = async () => {
   return await signOut(firebaseAuth);
 };
 
-const sendPasswordResetEmail = async (email) => {
+const sendResetEmail = async (email: string) => {
   return await sendPasswordResetEmail(firebaseAuth, email);
 };
 
@@ -31,7 +31,7 @@ const loginWithGoogle = async () => {
   return await signInWithPopup(firebaseAuth, provider);
 };
 
-const subscribeToAuthChanges = (handleAuthChange) => {
+const subscribeToAuthChanges = (handleAuthChange: (user: any) => void) => {
   onAuthStateChanged(firebaseAuth, (user) => {
     handleAuthChange(user);
   });
@@ -41,7 +41,7 @@ export const FirebaseAuthService = {
   registerUser,
   loginUser,
   logoutUser,
-  sendPasswordResetEmail,
+  sendResetEmail,
   loginWithGoogle,
   subscribeToAuthChanges,
 };
