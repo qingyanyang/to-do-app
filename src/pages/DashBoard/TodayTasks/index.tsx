@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import LocalizedFormat from 'dayjs/plugin/localizedFormat';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
 import {
   Progress,
   Text,
@@ -15,10 +14,16 @@ import {
   Checkbox,
   Badge,
   ScrollArea,
+  IconButton,
 } from '@radix-ui/themes';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
-import { ActivityLogIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import {
+  ActivityLogIcon,
+  BlendingModeIcon,
+  Cross2Icon,
+  MagnifyingGlassIcon,
+} from '@radix-ui/react-icons';
 
 function TodayTasks() {
   dayjs.extend(LocalizedFormat);
@@ -76,6 +81,14 @@ function TodayTasks() {
                   <Select.Item value='orange'>Orange</Select.Item>
                 </Select.Content>
               </Select.Root>
+              <Select.Root defaultValue='done'>
+                <Select.Trigger />
+                <Select.Content position='popper'>
+                  <Select.Item value='done'>Done</Select.Item>
+                  <Select.Item value='unfinish'>Unfinish</Select.Item>
+                </Select.Content>
+              </Select.Root>
+
               <Select.Root defaultValue='apple'>
                 <Select.Trigger />
                 <Select.Content position='popper'>
@@ -121,24 +134,34 @@ function TodayTasks() {
                           </Text>
                         </div>
                       </div>
-                      <div className='flex gap-2 items-center'>
-                        <Badge variant='soft' color='yellow'>
-                          &nbsp;&nbsp;life&nbsp;&nbsp;
-                        </Badge>
-                        <Badge variant='soft' color='pink'>
-                          &nbsp;&nbsp;entertainment&nbsp;&nbsp;
-                        </Badge>
-                        <Text
-                          color='indigo'
-                          size='1'
-                          className='flex items-center gap-1'
-                        >
-                          <span>
-                            <WhatshotIcon fontSize='small' />
-                            <WhatshotIcon fontSize='small' />
-                          </span>
-                          URGENT
-                        </Text>
+                      <div className='flex gap-6 items-center'>
+                        <div className='flex gap-2 items-center'>
+                          <Badge variant='soft' color='yellow'>
+                            &nbsp;&nbsp;life&nbsp;&nbsp;
+                          </Badge>
+                          <Badge variant='soft' color='pink'>
+                            &nbsp;&nbsp;entertainment&nbsp;&nbsp;
+                          </Badge>
+                          <Text
+                            color='indigo'
+                            size='1'
+                            className='flex items-center gap-1'
+                          >
+                            <Flex>
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                            </Flex>
+                            URGENT
+                          </Text>
+                        </div>
+
+                        <div>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
+                        </div>
                       </div>
                     </Flex>
                   </a>
@@ -164,24 +187,34 @@ function TodayTasks() {
                           </Text>
                         </div>
                       </div>
-                      <div className='flex gap-2 items-center'>
-                        <Badge variant='soft' color='yellow'>
-                          &nbsp;&nbsp;life&nbsp;&nbsp;
-                        </Badge>
-                        <Badge variant='soft' color='pink'>
-                          &nbsp;&nbsp;entertainment&nbsp;&nbsp;
-                        </Badge>
-                        <Text
-                          color='indigo'
-                          size='1'
-                          className='flex items-center gap-1'
-                        >
-                          <span>
-                            <WhatshotIcon fontSize='small' />
-                            <WhatshotIcon fontSize='small' />
-                          </span>
-                          URGENT
-                        </Text>
+                      <div className='flex gap-6 items-center'>
+                        <div className='flex gap-2 items-center'>
+                          <Badge variant='soft' color='yellow'>
+                            &nbsp;&nbsp;life&nbsp;&nbsp;
+                          </Badge>
+                          <Badge variant='soft' color='pink'>
+                            &nbsp;&nbsp;entertainment&nbsp;&nbsp;
+                          </Badge>
+                          <Text
+                            color='indigo'
+                            size='1'
+                            className='flex items-center gap-1'
+                          >
+                            <Flex>
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                            </Flex>
+                            URGENT
+                          </Text>
+                        </div>
+
+                        <div>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
+                        </div>
                       </div>
                     </Flex>
                   </a>
@@ -207,24 +240,34 @@ function TodayTasks() {
                           </Text>
                         </div>
                       </div>
-                      <div className='flex gap-2 items-center'>
-                        <Badge variant='soft' color='yellow'>
-                          &nbsp;&nbsp;life&nbsp;&nbsp;
-                        </Badge>
-                        <Badge variant='soft' color='pink'>
-                          &nbsp;&nbsp;entertainment&nbsp;&nbsp;
-                        </Badge>
-                        <Text
-                          color='indigo'
-                          size='1'
-                          className='flex items-center gap-1'
-                        >
-                          <span>
-                            <WhatshotIcon fontSize='small' />
-                            <WhatshotIcon fontSize='small' />
-                          </span>
-                          URGENT
-                        </Text>
+                      <div className='flex gap-6 items-center'>
+                        <div className='flex gap-2 items-center'>
+                          <Badge variant='soft' color='yellow'>
+                            &nbsp;&nbsp;life&nbsp;&nbsp;
+                          </Badge>
+                          <Badge variant='soft' color='pink'>
+                            &nbsp;&nbsp;entertainment&nbsp;&nbsp;
+                          </Badge>
+                          <Text
+                            color='indigo'
+                            size='1'
+                            className='flex items-center gap-1'
+                          >
+                            <Flex>
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                            </Flex>
+                            URGENT
+                          </Text>
+                        </div>
+
+                        <div>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
+                        </div>
                       </div>
                     </Flex>
                   </a>
@@ -250,24 +293,34 @@ function TodayTasks() {
                           </Text>
                         </div>
                       </div>
-                      <div className='flex gap-2 items-center'>
-                        <Badge variant='soft' color='yellow'>
-                          &nbsp;&nbsp;life&nbsp;&nbsp;
-                        </Badge>
-                        <Badge variant='soft' color='pink'>
-                          &nbsp;&nbsp;entertainment&nbsp;&nbsp;
-                        </Badge>
-                        <Text
-                          color='indigo'
-                          size='1'
-                          className='flex items-center gap-1'
-                        >
-                          <span>
-                            <WhatshotIcon fontSize='small' />
-                            <WhatshotIcon fontSize='small' />
-                          </span>
-                          URGENT
-                        </Text>
+                      <div className='flex gap-6 items-center'>
+                        <div className='flex gap-2 items-center'>
+                          <Badge variant='soft' color='yellow'>
+                            &nbsp;&nbsp;life&nbsp;&nbsp;
+                          </Badge>
+                          <Badge variant='soft' color='pink'>
+                            &nbsp;&nbsp;entertainment&nbsp;&nbsp;
+                          </Badge>
+                          <Text
+                            color='indigo'
+                            size='1'
+                            className='flex items-center gap-1'
+                          >
+                            <Flex>
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                            </Flex>
+                            URGENT
+                          </Text>
+                        </div>
+
+                        <div>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
+                        </div>
                       </div>
                     </Flex>
                   </a>
@@ -293,24 +346,34 @@ function TodayTasks() {
                           </Text>
                         </div>
                       </div>
-                      <div className='flex gap-2 items-center'>
-                        <Badge variant='soft' color='yellow'>
-                          &nbsp;&nbsp;life&nbsp;&nbsp;
-                        </Badge>
-                        <Badge variant='soft' color='pink'>
-                          &nbsp;&nbsp;entertainment&nbsp;&nbsp;
-                        </Badge>
-                        <Text
-                          color='indigo'
-                          size='1'
-                          className='flex items-center gap-1'
-                        >
-                          <span>
-                            <WhatshotIcon fontSize='small' />
-                            <WhatshotIcon fontSize='small' />
-                          </span>
-                          URGENT
-                        </Text>
+                      <div className='flex gap-6 items-center'>
+                        <div className='flex gap-2 items-center'>
+                          <Badge variant='soft' color='yellow'>
+                            &nbsp;&nbsp;life&nbsp;&nbsp;
+                          </Badge>
+                          <Badge variant='soft' color='pink'>
+                            &nbsp;&nbsp;entertainment&nbsp;&nbsp;
+                          </Badge>
+                          <Text
+                            color='indigo'
+                            size='1'
+                            className='flex items-center gap-1'
+                          >
+                            <Flex>
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                              <BlendingModeIcon />
+                            </Flex>
+                            URGENT
+                          </Text>
+                        </div>
+
+                        <div>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
+                        </div>
                       </div>
                     </Flex>
                   </a>
