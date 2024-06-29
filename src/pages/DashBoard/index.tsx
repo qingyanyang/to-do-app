@@ -101,14 +101,10 @@ function DashBoard() {
         </div>
       </Box>
       <Flex className='gap-5 ml-[250px] p-5 '>
-        <div className='flex-1'>
-          <Card>
-            <Section>
-              <Outlet />
-            </Section>
-          </Card>
+        <div className='flex-1 mt-9'>
+          <Outlet />
         </div>
-        <div className='w-[500px] h-[400px] desktop:block hidden'>
+        <div className='w-[500px] desktop:block hidden mt-9'>
           <Card>task content</Card>
         </div>
       </Flex>

@@ -22,7 +22,7 @@ export default {
         hover: '#3730a3',
       },
       disabled: {
-        DEFAULT: '#a3a3a3',
+        DEFAULT: '#b0b4ba',
         icon: '#e6e6e6',
       },
       error: {
@@ -132,7 +132,7 @@ export default {
       secondary: '#9ca3af',
       success: '#bbf7d0',
       brand: {
-        DEFAULT: '#c7ed77',
+        DEFAULT: '#4662d5',
         light: '#eef2ff',
         emphasize: '#4338ca',
       },

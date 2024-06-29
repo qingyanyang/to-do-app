@@ -14,8 +14,8 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Theme
-      accentColor='lime'
-      grayColor='sage'
+      accentColor='indigo'
+      grayColor='slate'
       panelBackground='translucent'
       appearance='dark'
       scaling='100%'
