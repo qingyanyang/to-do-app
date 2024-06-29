@@ -50,9 +50,7 @@ function DashBoard() {
               src='https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop'
               fallback='A'
             />
-            <Text className='text-primary-invert font-bold text-2xl'>
-              qingyan
-            </Text>
+            <Text className='font-semibold text-2xl'>qingyan</Text>
             <Button variant='surface' size='2' onClick={handleLogout}>
               &nbsp;&nbsp;&nbsp;Log out &nbsp;&nbsp;&nbsp;
             </Button>

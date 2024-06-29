@@ -34,7 +34,7 @@ interface TodoInputProps {
   error?: string;
 }
 
-const TodoInput: React.FC<TodoInputProps> = ({
+export const TodoInput: React.FC<TodoInputProps> = ({
   label,
   instruction = null,
   placeholder,
