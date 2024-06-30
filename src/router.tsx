@@ -3,7 +3,6 @@ import NotFound from './pages/NotFoundPage';
 import DashBoard from './pages/DashBoard';
 import TodayTasks from './pages/DashBoard/TodayTasks';
 import Calender from './pages/DashBoard/Calender';
-import PreferencesTasks from './pages/DashBoard/PreferencesTasks';
 import Settings from './pages/DashBoard/Settings';
 import Login from './pages/Login';
 import { ReactNode } from 'react';
@@ -50,10 +49,7 @@ const router = createBrowserRouter([
         path: 'calender',
         element: <Calender />,
       },
-      {
-        path: 'preferences-tasks',
-        element: <PreferencesTasks />,
-      },
+
       {
         path: 'settings',
         element: <Settings />,

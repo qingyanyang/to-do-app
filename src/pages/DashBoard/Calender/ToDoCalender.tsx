@@ -80,7 +80,7 @@ const ToDoCalender: React.FC = () => {
         token: {
           // Seed Token
           colorPrimary: '#495cac',
-          borderRadius: 6,
+          borderRadius: 8,
           colorBorder: '#494d53',
           colorBorderSecondary: '#494d53',
           colorTextQuaternary: '#494d53',
@@ -89,7 +89,15 @@ const ToDoCalender: React.FC = () => {
         },
       }}
     >
-      <Calendar cellRender={cellRender} />
+      <Calendar
+        cellRender={cellRender}
+        onSelect={(date, { source }) => {
+          console.log(date);
+          if (source === 'date') {
+            console.log('Panel Select:', source);
+          }
+        }}
+      />
     </ConfigProvider>
   );
 };

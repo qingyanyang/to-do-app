@@ -32,7 +32,6 @@ import {
   CalendarIcon,
   CountdownTimerIcon,
   Cross2Icon,
-  StarIcon,
   TokensIcon,
 } from '@radix-ui/react-icons';
 import dayjs from 'dayjs';
@@ -99,14 +98,6 @@ function DashBoard() {
                     <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
                       <CountdownTimerIcon />
                       Calender
-                    </div>
-                  </RouterLink>
-                </div>
-                <div className='border-l-2 border-x-brand px-4 py-4'>
-                  <RouterLink to={'preferences-tasks'}>
-                    <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
-                      <StarIcon />
-                      Preferences
                     </div>
                   </RouterLink>
                 </div>
