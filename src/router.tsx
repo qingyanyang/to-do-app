@@ -2,7 +2,7 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 import NotFound from './pages/NotFoundPage';
 import DashBoard from './pages/DashBoard';
 import TodayTasks from './pages/DashBoard/TodayTasks';
-import WeeklyPlan from './pages/DashBoard/WeeklyPlan';
+import Calender from './pages/DashBoard/Calender';
 import PreferencesTasks from './pages/DashBoard/PreferencesTasks';
 import Settings from './pages/DashBoard/Settings';
 import Login from './pages/Login';
@@ -47,8 +47,8 @@ const router = createBrowserRouter([
         element: <TodayTasks />,
       },
       {
-        path: 'weekly-tasks',
-        element: <WeeklyPlan />,
+        path: 'calender',
+        element: <Calender />,
       },
       {
         path: 'preferences-tasks',

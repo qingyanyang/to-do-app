@@ -18,7 +18,6 @@ import {
   Badge,
   IconButton,
   RadioGroup,
-  Switch,
   ScrollArea,
 } from '@radix-ui/themes';
 import { FirebaseAuthService } from '../../api/firebaseService/auth';
@@ -96,10 +95,10 @@ function DashBoard() {
                   </RouterLink>
                 </div>
                 <div className='border-l-2 border-brand px-4 py-4'>
-                  <RouterLink to={'weekly-tasks'}>
+                  <RouterLink to={'calender'}>
                     <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
                       <CountdownTimerIcon />
-                      Weekly Plan
+                      Calender
                     </div>
                   </RouterLink>
                 </div>
@@ -270,13 +269,7 @@ function DashBoard() {
                       </RadioGroup.Item>
                     </RadioGroup.Root>
                   </div>
-                  <div className='flex flex-col gap-2'>
-                    <Heading size='3'>Preference</Heading>
-                    <div className='flex gap-4 items-center'>
-                      <Switch defaultChecked />
-                      <Text color='gray'> Save to preference</Text>
-                    </div>
-                  </div>
+
                   <div className=''>
                     <Button variant='classic' size='2' onClick={handleLogout}>
                       &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
