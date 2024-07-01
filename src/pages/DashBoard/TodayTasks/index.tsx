@@ -23,11 +23,22 @@ import {
   BlendingModeIcon,
   Cross2Icon,
   MagnifyingGlassIcon,
+  Pencil1Icon,
 } from '@radix-ui/react-icons';
+import { useAppDispatch } from '../../../store/hooks';
+import { showTaskPanel } from '../../../store/modules/taskSlice';
 
 function TodayTasks() {
   dayjs.extend(LocalizedFormat);
   const formattedDate = dayjs().format('LL');
+
+  const dispatch = useAppDispatch();
+
+  const handleTaskCardClick = () => {
+    // show panel
+    dispatch(showTaskPanel());
+  };
+
   return (
     <div className='flex flex-col justify-start gap-9'>
       <div className='flex gap-4 items-baseline justify-between'>
@@ -47,11 +58,10 @@ function TodayTasks() {
           <WavingHandIcon />
         </Callout.Icon>
         <Callout.Text size='3'>
-          Welcome to{' '}
+          Welcome to
           <Link href='#'>
-            {' '}
             <Text className='font-semibold'>To do list 1.0.1</Text>
-          </Link>{' '}
+          </Link>
           ~~ Start to plan from today !
         </Callout.Text>
       </Callout.Root>
@@ -116,7 +126,7 @@ function TodayTasks() {
             <div className='flex flex-col gap-3'>
               <Box>
                 <Card asChild variant='classic'>
-                  <a href='#'>
+                  <label>
                     <Flex align='center' justify='between' gap='5'>
                       <div className='flex gap-4 items-center'>
                         <Checkbox size='3' defaultChecked />
@@ -136,9 +146,6 @@ function TodayTasks() {
                       </div>
                       <div className='flex gap-6 items-center'>
                         <div className='flex gap-2 items-center'>
-                          <Badge variant='soft' color='yellow'>
-                            &nbsp;&nbsp;life&nbsp;&nbsp;
-                          </Badge>
                           <Badge variant='soft' color='pink'>
                             &nbsp;&nbsp;entertainment&nbsp;&nbsp;
                           </Badge>
@@ -156,20 +163,26 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-
-                        <div>
+                        <Flex gapX='2'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
+                          >
+                            <Pencil1Icon />
+                          </IconButton>
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </div>
+                        </Flex>
                       </div>
                     </Flex>
-                  </a>
+                  </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
-                  <a href='#'>
+                  <label>
                     <Flex align='center' justify='between' gap='5'>
                       <div className='flex gap-4 items-center'>
                         <Checkbox size='3' defaultChecked />
@@ -189,9 +202,6 @@ function TodayTasks() {
                       </div>
                       <div className='flex gap-6 items-center'>
                         <div className='flex gap-2 items-center'>
-                          <Badge variant='soft' color='yellow'>
-                            &nbsp;&nbsp;life&nbsp;&nbsp;
-                          </Badge>
                           <Badge variant='soft' color='pink'>
                             &nbsp;&nbsp;entertainment&nbsp;&nbsp;
                           </Badge>
@@ -209,20 +219,26 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-
-                        <div>
+                        <Flex gapX='2'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
+                          >
+                            <Pencil1Icon />
+                          </IconButton>
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </div>
+                        </Flex>
                       </div>
                     </Flex>
-                  </a>
+                  </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
-                  <a href='#'>
+                  <label>
                     <Flex align='center' justify='between' gap='5'>
                       <div className='flex gap-4 items-center'>
                         <Checkbox size='3' defaultChecked />
@@ -242,9 +258,6 @@ function TodayTasks() {
                       </div>
                       <div className='flex gap-6 items-center'>
                         <div className='flex gap-2 items-center'>
-                          <Badge variant='soft' color='yellow'>
-                            &nbsp;&nbsp;life&nbsp;&nbsp;
-                          </Badge>
                           <Badge variant='soft' color='pink'>
                             &nbsp;&nbsp;entertainment&nbsp;&nbsp;
                           </Badge>
@@ -262,20 +275,26 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-
-                        <div>
+                        <Flex gapX='2'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
+                          >
+                            <Pencil1Icon />
+                          </IconButton>
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </div>
+                        </Flex>
                       </div>
                     </Flex>
-                  </a>
+                  </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
-                  <a href='#'>
+                  <label>
                     <Flex align='center' justify='between' gap='5'>
                       <div className='flex gap-4 items-center'>
                         <Checkbox size='3' defaultChecked />
@@ -295,9 +314,6 @@ function TodayTasks() {
                       </div>
                       <div className='flex gap-6 items-center'>
                         <div className='flex gap-2 items-center'>
-                          <Badge variant='soft' color='yellow'>
-                            &nbsp;&nbsp;life&nbsp;&nbsp;
-                          </Badge>
                           <Badge variant='soft' color='pink'>
                             &nbsp;&nbsp;entertainment&nbsp;&nbsp;
                           </Badge>
@@ -315,20 +331,26 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-
-                        <div>
+                        <Flex gapX='2'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
+                          >
+                            <Pencil1Icon />
+                          </IconButton>
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </div>
+                        </Flex>
                       </div>
                     </Flex>
-                  </a>
+                  </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
-                  <a href='#'>
+                  <label>
                     <Flex align='center' justify='between' gap='5'>
                       <div className='flex gap-4 items-center'>
                         <Checkbox size='3' defaultChecked />
@@ -348,9 +370,6 @@ function TodayTasks() {
                       </div>
                       <div className='flex gap-6 items-center'>
                         <div className='flex gap-2 items-center'>
-                          <Badge variant='soft' color='yellow'>
-                            &nbsp;&nbsp;life&nbsp;&nbsp;
-                          </Badge>
                           <Badge variant='soft' color='pink'>
                             &nbsp;&nbsp;entertainment&nbsp;&nbsp;
                           </Badge>
@@ -368,20 +387,26 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-
-                        <div>
+                        <Flex gapX='2'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
+                          >
+                            <Pencil1Icon />
+                          </IconButton>
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </div>
+                        </Flex>
                       </div>
                     </Flex>
-                  </a>
+                  </label>
                 </Card>
               </Box>
             </div>
           </ScrollArea>
-          <Link href='#'>
+          <Link href='#' onClick={() => dispatch(showTaskPanel())}>
             <Text className='flex gap-2 items-center'>
               <AddCircleIcon />
               Add Tasks

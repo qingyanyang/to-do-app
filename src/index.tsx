@@ -4,6 +4,8 @@ import './index.css';
 import '@radix-ui/themes/styles.css';
 import App from './App';
 import { Theme } from '@radix-ui/themes';
+import { Provider } from 'react-redux';
+import store from './store';
 
 // import firebase from '../FirebaseConfig';
 
@@ -21,7 +23,9 @@ root.render(
       scaling='100%'
       radius='full'
     >
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </Theme>
   </React.StrictMode>,
 );

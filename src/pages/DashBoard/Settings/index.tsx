@@ -21,7 +21,9 @@ function Settings() {
           <Tabs.Root defaultValue='account'>
             <Tabs.List>
               <Tabs.Trigger value='account'>
-                <Text className='text-xl font-semibold'>Preferences</Text>
+                <Text size='3' className='font-semibold'>
+                  Preferences
+                </Text>
               </Tabs.Trigger>
             </Tabs.List>
             <Box pt='3'>
@@ -38,13 +40,12 @@ function Settings() {
                       ></TextField.Root>
                     </div>
                     <Button radius='large'>
-                      {' '}
                       &nbsp;&nbsp;&nbsp;Add&nbsp;&nbsp;&nbsp;
                     </Button>
                   </Flex>
                   <Text color='gray' size='2'>
                     User can add at most 10 labels, each length of label cannot
-                    exceed 15 characters
+                    exceed 15 characters.
                   </Text>
                   <Flex wrap='wrap' gapX={'2'} gapY={'2'}>
                     <Badge color='indigo' size={'3'}>
@@ -87,16 +88,23 @@ function Settings() {
           <Tabs.Root defaultValue='account'>
             <Tabs.List>
               <Tabs.Trigger value='account'>
-                <Text className='text-xl font-semibold'>Notification</Text>
+                <Text size='3' className='font-semibold'>
+                  Notification
+                </Text>
               </Tabs.Trigger>
             </Tabs.List>
             <Box pt='3'>
               <Tabs.Content value='account' className='p-4'>
-                <Flex gap='4' align={'center'}>
-                  <Text className='text-l font-semibold' color='gray'>
-                    Allow Notifications{' '}
+                <Flex direction={'column'} gapY={'2'}>
+                  <Flex gap='4' align={'center'}>
+                    <Text className='text-l font-semibold' color='gray'>
+                      Allow Notifications
+                    </Text>
+                    <Switch defaultChecked size='3' />
+                  </Flex>
+                  <Text color='gray' size='2'>
+                    User can get notification popup when scheduled time is up.
                   </Text>
-                  <Switch defaultChecked size='3' />
                 </Flex>
               </Tabs.Content>
             </Box>
