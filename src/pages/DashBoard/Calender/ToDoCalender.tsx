@@ -1,11 +1,12 @@
-import React from 'react';
 import type { BadgeProps, CalendarProps } from 'antd';
 import { Badge, Calendar, ConfigProvider, theme } from 'antd';
 import type { Dayjs } from 'dayjs';
-import { Card, Flex, IconButton, Popover, ScrollArea } from '@radix-ui/themes';
+import { Card, Flex, IconButton } from '@radix-ui/themes';
 import { Cross1Icon, Pencil1Icon } from '@radix-ui/react-icons';
 import { useAppDispatch } from '../../../store/hooks';
 import { showTaskPanel } from '../../../store/modules/taskSlice';
+import { Popover } from 'antd';
+import { useState } from 'react';
 
 const getListData = (value: Dayjs) => {
   let listData: { type: string; content: string }[] = []; // Specify the type of listData
@@ -57,62 +58,68 @@ const ToDoCalender: React.FC = () => {
 
   const dateCellRender = (value: Dayjs) => {
     const dispatch = useAppDispatch();
-
+    const [clicked, setClicked] = useState(false);
+    const hide = () => {
+      setClicked(false);
+    };
+    const handleClickChange = (open: boolean) => {
+      setClicked(open);
+    };
     const handleTaskCardClick = () => {
+      hide();
       // show panel
       dispatch(showTaskPanel());
     };
-
     const listData = getListData(value);
+    const content = (
+      <div className='overflow-y-auto max-h-40'>
+        <ul className='events flex flex-col gap-1'>
+          {listData.map((item) => (
+            <Card>
+              <Flex align={'center'} justify={'between'} gap='1'>
+                <li key={item.content}>
+                  <Badge
+                    status={item.type as BadgeProps['status']}
+                    text={item.content}
+                  />
+                </li>
+                <div className='flex gap-2'>
+                  <IconButton
+                    variant='soft'
+                    size={'1'}
+                    onClick={handleTaskCardClick}
+                  >
+                    <Pencil1Icon />
+                  </IconButton>
+                  <IconButton variant='outline' size={'1'}>
+                    <Cross1Icon />
+                  </IconButton>
+                </div>
+              </Flex>
+            </Card>
+          ))}
+        </ul>
+      </div>
+    );
+
     return (
-      <Popover.Root>
-        <Popover.Trigger>
-          <ul className='events'>
-            {listData.slice(0, 2).map((item) => (
-              <li key={item.content}>
-                <Badge
-                  status={item.type as BadgeProps['status']}
-                  text={item.content}
-                />
-              </li>
-            ))}
-          </ul>
-        </Popover.Trigger>
-        <Popover.Content size='1' maxWidth='300px'>
-          <ScrollArea
-            type='hover'
-            scrollbars='vertical'
-            style={{ maxHeight: 300 }}
-          >
-            <ul className='events flex flex-col gap-1'>
-              {listData.map((item) => (
-                <Card>
-                  <Flex align={'center'} justify={'between'} gap='1'>
-                    <li key={item.content}>
-                      <Badge
-                        status={item.type as BadgeProps['status']}
-                        text={item.content}
-                      />
-                    </li>
-                    <Flex gap='2'>
-                      <IconButton
-                        variant='soft'
-                        size={'1'}
-                        onClick={handleTaskCardClick}
-                      >
-                        <Pencil1Icon />
-                      </IconButton>
-                      <IconButton variant='outline' size={'1'}>
-                        <Cross1Icon />
-                      </IconButton>
-                    </Flex>
-                  </Flex>
-                </Card>
-              ))}
-            </ul>
-          </ScrollArea>
-        </Popover.Content>
-      </Popover.Root>
+      <Popover
+        content={content}
+        open={clicked}
+        onOpenChange={handleClickChange}
+        trigger='hover'
+      >
+        <ul className='events'>
+          {listData.slice(0, 2).map((item) => (
+            <li key={item.content}>
+              <Badge
+                status={item.type as BadgeProps['status']}
+                text={item.content}
+              />
+            </li>
+          ))}
+        </ul>
+      </Popover>
     );
   };
 
@@ -125,6 +132,11 @@ const ToDoCalender: React.FC = () => {
   return (
     <ConfigProvider
       theme={{
+        components: {
+          Popover: {
+            zIndexPopup: 0,
+          },
+        },
         algorithm: theme.darkAlgorithm,
         token: {
           // Seed Token
@@ -142,7 +154,6 @@ const ToDoCalender: React.FC = () => {
         cellRender={cellRender}
         onSelect={(date, { source }) => {
           console.log(date);
-
           if (source === 'date') {
             console.log('Panel Select:', source);
           }

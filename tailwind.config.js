@@ -2,11 +2,13 @@ import { emphasize } from '@mui/material';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  important: true,
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     screens: {
       mobile: '375px',
-      tablet: '768px',
+      mMobile: '488px',
+      tablet: '884px',
       desktop: '1440px',
     },
     textColor: {
@@ -40,6 +42,7 @@ export default {
       neutral: '#525154',
     },
     backgroundColor: {
+      transparent: 'transparent',
       primary: {
         DEFAULT: '#fff',
         inverted: '#0a0a0a',
@@ -139,7 +142,7 @@ export default {
       transparent: 'transparent',
       error: '#fecaca',
       warning: '#fde68a',
-      neutral: '#2d2f2e',
+      neutral: '#34373a',
     },
     borderRadius: {
       none: '0',

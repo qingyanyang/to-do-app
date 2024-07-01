@@ -41,11 +41,10 @@ function TodayTasks() {
 
   return (
     <div className='flex flex-col justify-start gap-9'>
-      <div className='flex gap-4 items-baseline justify-between'>
+      <div className='flex flex-col tablet:flex-row gap-4 items-baseline justify-between'>
         <Text className='font-semibold text-4xl'>{formattedDate}</Text>
         <div className='flex gap-4 items-center'>
           <Text size='2' color='gray'>
-            {' '}
             7 of 10 Completed
           </Text>
           <Box width={'200px'}>
@@ -65,11 +64,11 @@ function TodayTasks() {
           ~~ Start to plan from today !
         </Callout.Text>
       </Callout.Root>
-      <div className='flex flex-col gap-8 h-screen'>
+      <div className='flex flex-col gap-8 h-full'>
         <div className='flex flex-col gap-4'>
           <Text className='text-xl font-semibold'>Today's Tasks</Text>
-          <div className='flex gap-3 items-center justify-between'>
-            <div className='flex-1'>
+          <div className='flex flex-col justify-between gap-3 items-start tablet:flex-row tablet:items-center'>
+            <div className='flex-1 w-full'>
               <TextField.Root placeholder='Search task' radius='large'>
                 <TextField.Slot>
                   <MagnifyingGlassIcon height='16' width='16' />
@@ -127,21 +126,35 @@ function TodayTasks() {
               <Box>
                 <Card asChild variant='classic'>
                   <label>
-                    <Flex align='center' justify='between' gap='5'>
-                      <div className='flex gap-4 items-center'>
-                        <Checkbox size='3' defaultChecked />
-                        <div className='flex flex-col'>
-                          <Text as='div' size='2' weight='bold'>
-                            Shopping with Bob ...
-                          </Text>
-                          <Text
-                            className='flex gap-2'
-                            as='div'
-                            color='gray'
-                            size='1'
+                    <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
+                      <div className='flex gap-4 items-center justify-between'>
+                        <div className='flex gap-4 items-center'>
+                          <Checkbox size='3' defaultChecked />
+                          <div className='flex flex-col'>
+                            <Text as='div' size='2' weight='bold'>
+                              Shopping with Bob ...
+                            </Text>
+                            <Text
+                              className='flex gap-2'
+                              as='div'
+                              color='gray'
+                              size='1'
+                            >
+                              June 29, 2024 * 2:30pm
+                            </Text>
+                          </div>
+                        </div>
+                        <div className='flex gap-2 tablet:hidden'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
                           >
-                            June 29, 2024 * 2:30pm
-                          </Text>
+                            <Pencil1Icon />
+                          </IconButton>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
                         </div>
                       </div>
                       <div className='flex gap-6 items-center'>
@@ -163,7 +176,7 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-                        <Flex gapX='2'>
+                        <div className=' hidden tablet:flex gap-2'>
                           <IconButton
                             variant='soft'
                             size={'1'}
@@ -174,30 +187,44 @@ function TodayTasks() {
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </Flex>
+                        </div>
                       </div>
-                    </Flex>
+                    </div>
                   </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
                   <label>
-                    <Flex align='center' justify='between' gap='5'>
-                      <div className='flex gap-4 items-center'>
-                        <Checkbox size='3' defaultChecked />
-                        <div className='flex flex-col'>
-                          <Text as='div' size='2' weight='bold'>
-                            Shopping with Bob ...
-                          </Text>
-                          <Text
-                            className='flex gap-2'
-                            as='div'
-                            color='gray'
-                            size='1'
+                    <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
+                      <div className='flex gap-4 items-center justify-between'>
+                        <div className='flex gap-4 items-center'>
+                          <Checkbox size='3' defaultChecked />
+                          <div className='flex flex-col'>
+                            <Text as='div' size='2' weight='bold'>
+                              Shopping with Bob ...
+                            </Text>
+                            <Text
+                              className='flex gap-2'
+                              as='div'
+                              color='gray'
+                              size='1'
+                            >
+                              June 29, 2024 * 2:30pm
+                            </Text>
+                          </div>
+                        </div>
+                        <div className='flex gap-2 tablet:hidden'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
                           >
-                            June 29, 2024 * 2:30pm
-                          </Text>
+                            <Pencil1Icon />
+                          </IconButton>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
                         </div>
                       </div>
                       <div className='flex gap-6 items-center'>
@@ -219,7 +246,7 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-                        <Flex gapX='2'>
+                        <div className=' hidden tablet:flex gap-2'>
                           <IconButton
                             variant='soft'
                             size={'1'}
@@ -230,30 +257,44 @@ function TodayTasks() {
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </Flex>
+                        </div>
                       </div>
-                    </Flex>
+                    </div>
                   </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
                   <label>
-                    <Flex align='center' justify='between' gap='5'>
-                      <div className='flex gap-4 items-center'>
-                        <Checkbox size='3' defaultChecked />
-                        <div className='flex flex-col'>
-                          <Text as='div' size='2' weight='bold'>
-                            Shopping with Bob ...
-                          </Text>
-                          <Text
-                            className='flex gap-2'
-                            as='div'
-                            color='gray'
-                            size='1'
+                    <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
+                      <div className='flex gap-4 items-center justify-between'>
+                        <div className='flex gap-4 items-center'>
+                          <Checkbox size='3' defaultChecked />
+                          <div className='flex flex-col'>
+                            <Text as='div' size='2' weight='bold'>
+                              Shopping with Bob ...
+                            </Text>
+                            <Text
+                              className='flex gap-2'
+                              as='div'
+                              color='gray'
+                              size='1'
+                            >
+                              June 29, 2024 * 2:30pm
+                            </Text>
+                          </div>
+                        </div>
+                        <div className='flex gap-2 tablet:hidden'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
                           >
-                            June 29, 2024 * 2:30pm
-                          </Text>
+                            <Pencil1Icon />
+                          </IconButton>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
                         </div>
                       </div>
                       <div className='flex gap-6 items-center'>
@@ -275,7 +316,7 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-                        <Flex gapX='2'>
+                        <div className=' hidden tablet:flex gap-2'>
                           <IconButton
                             variant='soft'
                             size={'1'}
@@ -286,30 +327,44 @@ function TodayTasks() {
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </Flex>
+                        </div>
                       </div>
-                    </Flex>
+                    </div>
                   </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
                   <label>
-                    <Flex align='center' justify='between' gap='5'>
-                      <div className='flex gap-4 items-center'>
-                        <Checkbox size='3' defaultChecked />
-                        <div className='flex flex-col'>
-                          <Text as='div' size='2' weight='bold'>
-                            Shopping with Bob ...
-                          </Text>
-                          <Text
-                            className='flex gap-2'
-                            as='div'
-                            color='gray'
-                            size='1'
+                    <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
+                      <div className='flex gap-4 items-center justify-between'>
+                        <div className='flex gap-4 items-center'>
+                          <Checkbox size='3' defaultChecked />
+                          <div className='flex flex-col'>
+                            <Text as='div' size='2' weight='bold'>
+                              Shopping with Bob ...
+                            </Text>
+                            <Text
+                              className='flex gap-2'
+                              as='div'
+                              color='gray'
+                              size='1'
+                            >
+                              June 29, 2024 * 2:30pm
+                            </Text>
+                          </div>
+                        </div>
+                        <div className='flex gap-2 tablet:hidden'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
                           >
-                            June 29, 2024 * 2:30pm
-                          </Text>
+                            <Pencil1Icon />
+                          </IconButton>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
                         </div>
                       </div>
                       <div className='flex gap-6 items-center'>
@@ -331,7 +386,7 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-                        <Flex gapX='2'>
+                        <div className=' hidden tablet:flex gap-2'>
                           <IconButton
                             variant='soft'
                             size={'1'}
@@ -342,30 +397,44 @@ function TodayTasks() {
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </Flex>
+                        </div>
                       </div>
-                    </Flex>
+                    </div>
                   </label>
                 </Card>
               </Box>
               <Box>
                 <Card asChild variant='classic'>
                   <label>
-                    <Flex align='center' justify='between' gap='5'>
-                      <div className='flex gap-4 items-center'>
-                        <Checkbox size='3' defaultChecked />
-                        <div className='flex flex-col'>
-                          <Text as='div' size='2' weight='bold'>
-                            Shopping with Bob ...
-                          </Text>
-                          <Text
-                            className='flex gap-2'
-                            as='div'
-                            color='gray'
-                            size='1'
+                    <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
+                      <div className='flex gap-4 items-center justify-between'>
+                        <div className='flex gap-4 items-center'>
+                          <Checkbox size='3' defaultChecked />
+                          <div className='flex flex-col'>
+                            <Text as='div' size='2' weight='bold'>
+                              Shopping with Bob ...
+                            </Text>
+                            <Text
+                              className='flex gap-2'
+                              as='div'
+                              color='gray'
+                              size='1'
+                            >
+                              June 29, 2024 * 2:30pm
+                            </Text>
+                          </div>
+                        </div>
+                        <div className='flex gap-2 tablet:hidden'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskCardClick}
                           >
-                            June 29, 2024 * 2:30pm
-                          </Text>
+                            <Pencil1Icon />
+                          </IconButton>
+                          <IconButton variant='outline' size={'1'}>
+                            <Cross2Icon />
+                          </IconButton>
                         </div>
                       </div>
                       <div className='flex gap-6 items-center'>
@@ -387,7 +456,7 @@ function TodayTasks() {
                             URGENT
                           </Text>
                         </div>
-                        <Flex gapX='2'>
+                        <div className=' hidden tablet:flex gap-2'>
                           <IconButton
                             variant='soft'
                             size={'1'}
@@ -398,9 +467,9 @@ function TodayTasks() {
                           <IconButton variant='outline' size={'1'}>
                             <Cross2Icon />
                           </IconButton>
-                        </Flex>
+                        </div>
                       </div>
-                    </Flex>
+                    </div>
                   </label>
                 </Card>
               </Box>
