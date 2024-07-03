@@ -18,8 +18,14 @@ import {
 } from '@radix-ui/themes';
 import React, { useState, ReactNode } from 'react';
 import { FirebaseAuthService } from '../../api/firebaseService/auth';
+import { FirebaseFirestoreService } from '../../api/firebaseService/db';
 import { useNavigate } from 'react-router-dom';
-import { setProfileURL, setToken } from '../../util/localStorageFucs';
+import {
+  setProfileURL,
+  setToken,
+  setUID,
+  setUserEmail,
+} from '../../util/localStorageFucs';
 
 interface TodoInputProps {
   label: string;
@@ -120,12 +126,13 @@ function Login() {
         setPassword('');
         // save info
         const accessToken = await res.user.getIdToken();
+        setUID(res.user.uid);
         setToken(accessToken);
-        setEmail(res.user.email ? res.user.email : '');
+        setUserEmail(res.user.email ? res.user.email : '');
         setProfileURL(
-          res.user.providerData[0].photoURL
-            ? res.user.providerData[0].photoURL
-            : '',
+          res.user.photoURL
+            ? res.user.photoURL
+            : 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop',
         );
         // redirect
         navigate('/');
@@ -140,12 +147,13 @@ function Login() {
       const res = await FirebaseAuthService.loginWithGoogle();
       // save info
       const accessToken = await res.user.getIdToken();
+      setUID(res.user.uid);
       setToken(accessToken);
-      setEmail(res.user.email ? res.user.email : '');
+      setUserEmail(res.user.email ? res.user.email : 'user');
       setProfileURL(
-        res.user.providerData[0].photoURL
-          ? res.user.providerData[0].photoURL
-          : '',
+        res.user.photoURL
+          ? res.user.photoURL
+          : 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop',
       );
       // redirect
       navigate('/');
@@ -264,7 +272,24 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
     //validations
     if (!emailErrorMSG && !passwordErrorMSG && !passwordConfirmErrorMSG) {
       try {
-        await FirebaseAuthService.registerUser(email, password);
+        const res = await FirebaseAuthService.registerUser(email, password);
+        const userEmail = res.user.email;
+        const uid = res.user.uid;
+        const photoURL = res.user.photoURL
+          ? res.user.photoURL
+          : 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop';
+
+        // create user document
+        await FirebaseFirestoreService.createDocument(
+          'users',
+          {
+            email: userEmail,
+            uid: uid,
+            photoURL: photoURL,
+          },
+          uid,
+        );
+
         setEmail('');
         setPassword('');
         setConfirmPassword('');

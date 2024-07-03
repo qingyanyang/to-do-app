@@ -27,6 +27,7 @@ import {
 } from '@radix-ui/react-icons';
 import { useAppDispatch } from '../../../store/hooks';
 import { showTaskPanel } from '../../../store/modules/taskSlice';
+import { useEffect } from 'react';
 
 function TodayTasks() {
   dayjs.extend(LocalizedFormat);
@@ -38,6 +39,23 @@ function TodayTasks() {
     // show panel
     dispatch(showTaskPanel());
   };
+
+  /**
+   * fetch data from server and update states together:
+   */
+  // tasks: get data only initial time then initialize state
+  // labels: get data only initial time then initialize state
+  // delete/update: call update api then update state
+
+  /**
+   * manipulate state without fetching data, dynamically get:
+   */
+  // filter by [level, label, done]
+  // sort by [ z-a, a-z ][ level, createtime, datetime scheduled]
+  useEffect(() => {
+    // get labels
+    // get tasks
+  }, []);
 
   return (
     <div className='flex flex-col justify-start gap-9'>
@@ -491,13 +509,17 @@ function TodayTasks() {
           <Text color='gray' className='text-2xl'>
             You haven't added any tasks
           </Text>
-        </div>
-        <div className='flex justify-center'>
-          <div className='rounded-full text-brand border-brand border-dashed border'>
-            <Button size='3' variant='soft'>
-              <AddCircleIcon />
-              Add Tasks
-            </Button>
+          <div className='flex justify-center'>
+            <div className='rounded-full text-brand border-brand border-dashed border'>
+              <Button
+                size='3'
+                variant='soft'
+                onClick={() => dispatch(showTaskPanel())}
+              >
+                <AddCircleIcon />
+                Add Tasks
+              </Button>
+            </div>
           </div>
         </div>
       </div>

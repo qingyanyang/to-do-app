@@ -1,6 +1,18 @@
+const UID_KEY = 'uid';
 const TOKEN_KEY = 'token';
 const EMAIL_KEY = 'email';
 const PRO_URL_KEY = 'profileURL';
+
+// uid
+const getUID = () => {
+  return localStorage.getItem(UID_KEY);
+};
+const setUID = (uid: string) => {
+  localStorage.setItem(UID_KEY, uid);
+};
+const removeUID = () => {
+  localStorage.removeItem(UID_KEY);
+};
 
 // token
 const getToken = () => {
@@ -14,13 +26,13 @@ const removeToken = () => {
 };
 
 // email
-const getEmail = () => {
+const getUserEmail = () => {
   return localStorage.getItem(EMAIL_KEY);
 };
-const setEmail = (email: string) => {
+const setUserEmail = (email: string) => {
   localStorage.setItem(EMAIL_KEY, email);
 };
-const removeEmail = () => {
+const removeUserEmail = () => {
   localStorage.removeItem(EMAIL_KEY);
 };
 
@@ -36,13 +48,16 @@ const removeProfileURL = () => {
 };
 
 export {
+  getUID,
+  setUID,
+  removeUID,
   getToken,
   setToken,
   removeToken,
   getProfileURL,
   setProfileURL,
   removeProfileURL,
-  getEmail,
-  setEmail,
-  removeEmail,
+  getUserEmail,
+  setUserEmail,
+  removeUserEmail,
 };

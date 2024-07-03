@@ -14,16 +14,104 @@ import {
   Badge,
   Button,
 } from '@radix-ui/themes';
+
 import dayjs from 'dayjs';
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppDispatch } from '../../../store/hooks';
-import { hideTaskPanel } from '../../../store/modules/taskSlice';
+import {
+  createTaskAsync,
+  hideTaskPanel,
+} from '../../../store/modules/taskSlice';
+import { validateTaskDesc } from '../../../util/validations';
+import { getUID } from '../../../util/localStorageFucs';
+
+const labels = [
+  { name: 'study', Color: 'indigo' },
+  { name: 'work', color: 'cyan' },
+  { name: 'health', color: 'orange' },
+  { name: 'dating', color: 'crimson' },
+  { name: 'entertainment', color: 'yellow' },
+];
 
 const TaskPanel = () => {
-  const date1 = dayjs('2024-06-29T00:00');
-  const date2 = dayjs('2024-06-29T00:00');
+  const [desc, setDesc] = useState('');
+  const [counter, setCounter] = useState(0);
+  const [startScheduleTime, setStartScheduleTime] = useState(dayjs());
+  const [endScheduleTime, setEndScheduleTime] = useState(dayjs());
+  const [startScheduleDate, setStartScheduleDate] = useState(dayjs());
+  const [endScheduleDate, setEndScheduleDate] = useState(dayjs());
+  const [selectedSeverityValue, setSelectedSeverityValue] = useState('Low');
+  const [selectedLabelValue, setSelectedLabelValue] = useState(0);
+  const [descErrorMsg, setDescErrorMsg] = useState('');
 
   const dispatch = useAppDispatch();
+
+  const handleCreateTask = () => {
+    console.log(desc);
+    console.log(startScheduleTime);
+    console.log(endScheduleTime);
+    console.log(startScheduleDate);
+    console.log(endScheduleDate);
+    console.log(selectedSeverityValue);
+    console.log(labels[selectedLabelValue].name);
+    handleDescValidation();
+    if (descErrorMsg === '') {
+      const uid = getUID();
+      if (!uid) {
+        throw new Error('Please check the uid');
+      }
+      dispatch(
+        createTaskAsync({
+          uid: uid,
+          desc: desc,
+          label: labels[selectedLabelValue].name,
+          severity: selectedSeverityValue,
+          scheduledStartTime: startScheduleTime,
+          scheduledEndTime: endScheduleTime,
+          scheduledStartDate: startScheduleDate,
+          scheduledEndDate: endScheduleDate,
+          isCompleted: false,
+        }),
+      );
+    }
+  };
+  const handleDescValidation = () => {
+    const errorMsg = validateTaskDesc(desc);
+    setDescErrorMsg(errorMsg);
+  };
+
+  const handleTextAreaOnChange = () => {
+    return (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const descContent = e.target.value;
+      setDesc(descContent);
+      setCounter(descContent.length);
+    };
+  };
+
+  const getTimeRangeValue = () => {
+    return (value: any, context: any) => {
+      setStartScheduleTime(value[0]);
+      setEndScheduleTime(value[1]);
+      console.log(context);
+    };
+  };
+
+  const getDateRangeValue = () => {
+    return (value: any, context: any) => {
+      setStartScheduleDate(dayjs(value[0]));
+      setEndScheduleDate(dayjs(value[1]));
+
+      console.log(context);
+    };
+  };
+
+  const handleSeverityChange = (value: string) => {
+    setSelectedSeverityValue(value);
+  };
+
+  const handleLabelClick = (index: number) => {
+    setSelectedLabelValue(index);
+  };
 
   return (
     <div className='w-screen h-full fixed top-0 desktop:relative'>
@@ -40,19 +128,29 @@ const TaskPanel = () => {
             scrollbars='vertical'
             style={{ maxHeight: 630 }}
           >
-            <div className='flex flex-col gap-8 pt-2 pb-6 px-4'>
+            <div className='flex flex-col gap-8 pt-2 pb-12 px-4'>
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Task Description *</Heading>
                 <Box>
                   <TextArea
+                    onBlur={handleDescValidation}
+                    value={desc}
+                    onChange={handleTextAreaOnChange()}
                     size='3'
                     placeholder='Enter task description…'
-                    maxLength={800}
+                    maxLength={200}
                   />
                 </Box>
-                <Text color='gray' size='2'>
-                  0/800
-                </Text>
+                <div className='flex gap-4 justify-between'>
+                  <Text color={counter >= 200 ? 'indigo' : 'gray'} size='2'>
+                    {counter}/200
+                  </Text>
+                  {descErrorMsg && (
+                    <Text color='red' size='2'>
+                      {descErrorMsg}
+                    </Text>
+                  )}
+                </div>
               </div>
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Time Schedule</Heading>
@@ -61,7 +159,8 @@ const TaskPanel = () => {
                     input: { color: '#7f838b', borderColor: 'white' },
                   }}
                   variant={'standard'}
-                  defaultValue={[date1, date2]}
+                  value={[startScheduleTime, endScheduleTime]}
+                  onChange={getTimeRangeValue()}
                 />
               </div>
               <div className='flex flex-col gap-2'>
@@ -71,16 +170,19 @@ const TaskPanel = () => {
                     input: { color: '#7f838b', borderColor: 'white' },
                   }}
                   variant={'standard'}
-                  defaultValue={[date1, date2]}
+                  value={[startScheduleDate, endScheduleDate]}
+                  onChange={getDateRangeValue()}
                 />
               </div>
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Severity *</Heading>
                 <RadioCards.Root
-                  defaultValue='1'
+                  defaultValue='Low'
+                  value={selectedSeverityValue}
+                  onValueChange={handleSeverityChange}
                   columns={{ initial: '1', sm: '4' }}
                 >
-                  <RadioCards.Item value='1'>
+                  <RadioCards.Item value='Low'>
                     <Flex
                       direction='column'
                       align='center'
@@ -93,7 +195,7 @@ const TaskPanel = () => {
                       </Flex>
                     </Flex>
                   </RadioCards.Item>
-                  <RadioCards.Item value='2'>
+                  <RadioCards.Item value='Moderate'>
                     <Flex
                       direction='column'
                       align='center'
@@ -107,7 +209,7 @@ const TaskPanel = () => {
                       </Flex>
                     </Flex>
                   </RadioCards.Item>
-                  <RadioCards.Item value='3'>
+                  <RadioCards.Item value='Critical'>
                     <Flex
                       direction='column'
                       align='center'
@@ -122,7 +224,7 @@ const TaskPanel = () => {
                       </Flex>
                     </Flex>
                   </RadioCards.Item>
-                  <RadioCards.Item value='4'>
+                  <RadioCards.Item value='Urgent'>
                     <Flex
                       direction='column'
                       align='center'
@@ -143,25 +245,50 @@ const TaskPanel = () => {
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Labels *</Heading>
                 <Flex wrap='wrap' gapX={'2'} gapY={'2'}>
-                  <Badge color='indigo' size={'3'}>
+                  <Badge
+                    onClick={() => handleLabelClick(0)}
+                    variant={selectedLabelValue === 0 ? 'solid' : 'outline'}
+                    color='indigo'
+                    size={'3'}
+                  >
                     study
                   </Badge>
-                  <Badge color='cyan' size={'3'}>
+                  <Badge
+                    onClick={() => handleLabelClick(1)}
+                    variant={selectedLabelValue === 1 ? 'solid' : 'outline'}
+                    color='cyan'
+                    size={'3'}
+                  >
                     work
                   </Badge>
-                  <Badge color='orange' size={'3'}>
+                  <Badge
+                    onClick={() => handleLabelClick(2)}
+                    variant={selectedLabelValue === 2 ? 'solid' : 'outline'}
+                    color='orange'
+                    size={'3'}
+                  >
                     health
                   </Badge>
-                  <Badge color='crimson' size={'3'}>
+                  <Badge
+                    onClick={() => handleLabelClick(3)}
+                    variant={selectedLabelValue === 3 ? 'solid' : 'outline'}
+                    color='crimson'
+                    size={'3'}
+                  >
                     dating
                   </Badge>
-                  <Badge color='yellow' size={'3'}>
+                  <Badge
+                    onClick={() => handleLabelClick(4)}
+                    variant={selectedLabelValue === 4 ? 'solid' : 'outline'}
+                    color='yellow'
+                    size={'3'}
+                  >
                     entertainment
                   </Badge>
                 </Flex>
               </div>
               <div>
-                <Button variant='classic' size='2' onClick={() => {}}>
+                <Button variant='classic' size='2' onClick={handleCreateTask}>
                   &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
                 </Button>
               </div>

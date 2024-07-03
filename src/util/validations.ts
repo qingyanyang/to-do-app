@@ -31,3 +31,10 @@ export const validateConfirmPassword = (
   }
   return '';
 };
+
+export const validateTaskDesc = (value: string) => {
+  if (!value) {
+    return 'Task description is required';
+  }
+  return '';
+};

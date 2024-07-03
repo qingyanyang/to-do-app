@@ -6,9 +6,12 @@ import React, { useState } from 'react';
 import { Avatar, Button, Flex, Section, Text } from '@radix-ui/themes';
 import { FirebaseAuthService } from '../../api/firebaseService/auth';
 import {
-  removeEmail,
+  getUserEmail,
+  getProfileURL,
+  removeUserEmail,
   removeProfileURL,
   removeToken,
+  removeUID,
 } from '../../util/localStorageFucs';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
@@ -30,20 +33,47 @@ const theme = createTheme({
   },
 });
 
+const navMenu = [
+  {
+    icon: <CountdownTimerIcon />,
+    label: "Today's",
+    path: '/',
+  },
+  {
+    icon: <CalendarIcon />,
+    label: 'Calender',
+    path: 'calender',
+  },
+  {
+    icon: <TokensIcon />,
+    label: 'Settings',
+    path: 'settings',
+  },
+];
+
 function DashBoard() {
   const [showNavBar, setShowNavBar] = useState(false);
-  const navigate = useNavigate();
+  const [navMenuIndex, setNavMenuIndex] = useState(0); // 0: todays; 1: calender; 2: settings
+
   const { taskPanelVisible } = useAppSelector((state) => state.task);
   const dispatch = useAppDispatch();
+
+  const navigate = useNavigate();
+
+  const handleNavMenuSwitch = (index: number) => {
+    setNavMenuIndex(index);
+  };
+
   const handleShowNavBar = () => {
     setShowNavBar(!showNavBar);
   };
+
   const handleLogout = async () => {
-    console.log('logout');
     try {
       await FirebaseAuthService.logoutUser();
       // clear storage
-      removeEmail();
+      removeUID();
+      removeUserEmail();
       removeToken();
       removeProfileURL();
       //redirect
@@ -105,14 +135,15 @@ function DashBoard() {
                 <Avatar
                   size='3'
                   radius='full'
-                  src='https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop'
+                  src={getProfileURL() ?? undefined}
                   fallback='A'
                 />
-                <Text className='text-l'>qingyan</Text>
+                <Text className='text-l short-label-ellipsis'>
+                  {getUserEmail()}
+                </Text>
               </Section>
             </div>
           </div>
-
           {/* left nav bar */}
           <div className='border-r-[1px] px-4 border-neutral hidden tablet:block w-[250px] h-full fixed'>
             <div className='flex flex-col gap-20 justify-between h-full'>
@@ -120,39 +151,34 @@ function DashBoard() {
                 <Avatar
                   size='6'
                   radius='full'
-                  src='https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop'
+                  src={getProfileURL() ?? undefined}
                   fallback='A'
                 />
-                <Text className='font-semibold text-2xl'>qingyan</Text>
+                <Text className='font-semibold text-2xl short-text-ellipsis'>
+                  {getUserEmail()}
+                </Text>
                 <Button variant='surface' size='2' onClick={handleLogout}>
                   &nbsp;&nbsp;&nbsp;Log out &nbsp;&nbsp;&nbsp;
                 </Button>
               </div>
               <div className='border-l-[0.5px] flex flex-col border-neutral'>
-                <div className='border-l-2 border-x-brand px-4 py-4  rounded-r-lg'>
-                  <RouterLink to={'/'}>
-                    <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
-                      <CalendarIcon />
-                      Today's
-                    </div>
-                  </RouterLink>
-                </div>
-                <div className='border-l-2 border-brand px-4 py-4'>
-                  <RouterLink to={'calender'}>
-                    <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
-                      <CountdownTimerIcon />
-                      Calender
-                    </div>
-                  </RouterLink>
-                </div>
-                <div className='border-l-2 border-x-brand px-4 py-4'>
-                  <RouterLink to={'settings'}>
-                    <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
-                      <TokensIcon />
-                      Settings
-                    </div>
-                  </RouterLink>
-                </div>
+                {navMenu.map((menuItem, index) => (
+                  <div
+                    className={`${navMenuIndex === index && ' border-x-brand'} border-l-2 border-transparent px-4 py-4`}
+                  >
+                    <RouterLink
+                      to={menuItem.path}
+                      onClick={() => handleNavMenuSwitch(index)}
+                    >
+                      <div
+                        className={`text-disabled ${navMenuIndex === index && 'text-primary-invert'} flex justify-start gap-6 items-center  hover:text-primary-invert`}
+                      >
+                        {menuItem.icon}
+                        {menuItem.label}
+                      </div>
+                    </RouterLink>
+                  </div>
+                ))}
               </div>
               <div className='flex flex-col mb-28'>
                 <Button size={'3'} onClick={() => dispatch(showTaskPanel())}>
@@ -161,7 +187,6 @@ function DashBoard() {
               </div>
             </div>
           </div>
-
           <Flex className='gap-5 h-full tablet:ml-[250px] p-4 relative top-[80px] tablet:top-0'>
             <div className='flex-1 mt-4 h-full tablet:mt-9'>
               <Outlet />
