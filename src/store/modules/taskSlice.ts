@@ -55,7 +55,7 @@ interface TaskState {
   } | null;
   loading: boolean;
   error: string | null;
-  success: boolean;
+  success: string | null;
 }
 
 const initialState: TaskState = {
@@ -67,7 +67,7 @@ const initialState: TaskState = {
   editTaskContent: null,
   loading: false,
   error: null,
-  success: false,
+  success: null,
 };
 
 // need unit test
@@ -222,7 +222,7 @@ export const taskSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setSuccess: (state, action: PayloadAction<boolean>) => {
+    setSuccess: (state, action: PayloadAction<string | null>) => {
       state.success = action.payload;
     },
   },
@@ -242,7 +242,10 @@ export const {
 export const getTaskStore = (state: RootState) => state.task;
 
 export const createTaskAsync =
-  (document: Task): ThunkAction<void, RootState, unknown, UnknownAction> =>
+  (
+    document: Task,
+    onSuccess?: () => void,
+  ): ThunkAction<void, RootState, unknown, UnknownAction> =>
   async (dispatch) => {
     const createdDateTime = new Date();
     const taskWithTimestamps = {
@@ -256,7 +259,7 @@ export const createTaskAsync =
     };
     dispatch(setLoading(true));
     dispatch(setError(null));
-    dispatch(setSuccess(false));
+    dispatch(setSuccess(null));
     try {
       await FirebaseFirestoreService.createDocument(
         'tasks',
@@ -264,8 +267,8 @@ export const createTaskAsync =
         document.scheduledStartTime.toDate().getTime().toString(),
       );
       dispatch(setLoading(false));
-      dispatch(setSuccess(true));
-
+      dispatch(setSuccess('Create task successfully!'));
+      if (onSuccess) onSuccess();
       // update
       // getTodayTasksAsync()
       // getMonthTasksAsync()
@@ -274,7 +277,7 @@ export const createTaskAsync =
       dispatch(
         setError(error instanceof Error ? error.message : 'Unknown error'),
       );
-      dispatch(setSuccess(false));
+      dispatch(setSuccess(null));
     }
   };
 

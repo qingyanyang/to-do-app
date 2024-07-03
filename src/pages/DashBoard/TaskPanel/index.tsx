@@ -13,11 +13,12 @@ import {
   Flex,
   Badge,
   Button,
+  Spinner,
 } from '@radix-ui/themes';
 
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
   createTaskAsync,
   hideTaskPanel,
@@ -45,6 +46,18 @@ const TaskPanel = () => {
   const [descErrorMsg, setDescErrorMsg] = useState('');
 
   const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.task);
+
+  const onSuccess = () => {
+    setDesc('');
+    setCounter(0);
+    setStartScheduleTime(dayjs());
+    setEndScheduleTime(dayjs());
+    setStartScheduleDate(dayjs());
+    setEndScheduleDate(dayjs());
+    setSelectedSeverityValue('Low');
+    setSelectedLabelValue(0);
+  };
 
   const handleCreateTask = () => {
     console.log(desc);
@@ -61,17 +74,20 @@ const TaskPanel = () => {
         throw new Error('Please check the uid');
       }
       dispatch(
-        createTaskAsync({
-          uid: uid,
-          desc: desc,
-          label: labels[selectedLabelValue].name,
-          severity: selectedSeverityValue,
-          scheduledStartTime: startScheduleTime,
-          scheduledEndTime: endScheduleTime,
-          scheduledStartDate: startScheduleDate,
-          scheduledEndDate: endScheduleDate,
-          isCompleted: false,
-        }),
+        createTaskAsync(
+          {
+            uid: uid,
+            desc: desc,
+            label: labels[selectedLabelValue].name,
+            severity: selectedSeverityValue,
+            scheduledStartTime: startScheduleTime,
+            scheduledEndTime: endScheduleTime,
+            scheduledStartDate: startScheduleDate,
+            scheduledEndDate: endScheduleDate,
+            isCompleted: false,
+          },
+          onSuccess,
+        ),
       );
     }
   };
@@ -289,7 +305,9 @@ const TaskPanel = () => {
               </div>
               <div>
                 <Button variant='classic' size='2' onClick={handleCreateTask}>
-                  &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
+                  <Spinner loading={loading}>
+                    &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
+                  </Spinner>
                 </Button>
               </div>
             </div>

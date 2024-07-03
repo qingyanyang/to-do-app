@@ -1,5 +1,5 @@
 import type { BadgeProps, CalendarProps } from 'antd';
-import { Badge, Calendar, ConfigProvider, theme } from 'antd';
+import { Badge, Calendar } from 'antd';
 import type { Dayjs } from 'dayjs';
 import { Card, Flex, IconButton } from '@radix-ui/themes';
 import { Cross1Icon, Pencil1Icon } from '@radix-ui/react-icons';
@@ -130,36 +130,15 @@ const ToDoCalender: React.FC = () => {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        components: {
-          Popover: {
-            zIndexPopup: 0,
-          },
-        },
-        algorithm: theme.darkAlgorithm,
-        token: {
-          // Seed Token
-          colorPrimary: '#495cac',
-          borderRadius: 8,
-          colorBorder: '#494d53',
-          colorBorderSecondary: '#494d53',
-          colorTextQuaternary: '#494d53',
-          colorBgContainer: '#111113',
-          colorBgBase: '#18191b',
-        },
+    <Calendar
+      cellRender={cellRender}
+      onSelect={(date, { source }) => {
+        console.log(date);
+        if (source === 'date') {
+          console.log('Panel Select:', source);
+        }
       }}
-    >
-      <Calendar
-        cellRender={cellRender}
-        onSelect={(date, { source }) => {
-          console.log(date);
-          if (source === 'date') {
-            console.log('Panel Select:', source);
-          }
-        }}
-      />
-    </ConfigProvider>
+    />
   );
 };
 

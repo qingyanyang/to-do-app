@@ -15,6 +15,7 @@ import {
   Badge,
   ScrollArea,
   IconButton,
+  Spinner,
 } from '@radix-ui/themes';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
@@ -25,7 +26,7 @@ import {
   MagnifyingGlassIcon,
   Pencil1Icon,
 } from '@radix-ui/react-icons';
-import { useAppDispatch } from '../../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { showTaskPanel } from '../../../store/modules/taskSlice';
 import { useEffect } from 'react';
 
@@ -34,6 +35,7 @@ function TodayTasks() {
   const formattedDate = dayjs().format('LL');
 
   const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.task);
 
   const handleTaskCardClick = () => {
     // show panel
@@ -147,7 +149,9 @@ function TodayTasks() {
                     <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
                       <div className='flex gap-4 items-center justify-between'>
                         <div className='flex gap-4 items-center'>
-                          <Checkbox size='3' defaultChecked />
+                          <Spinner loading={loading}>
+                            <Checkbox size='3' defaultChecked />
+                          </Spinner>
                           <div className='flex flex-col'>
                             <Text as='div' size='2' weight='bold'>
                               Shopping with Bob ...
