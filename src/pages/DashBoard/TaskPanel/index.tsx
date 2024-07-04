@@ -11,7 +11,6 @@ import {
   Text,
   RadioCards,
   Flex,
-  Badge,
   Button,
   Spinner,
   AlertDialog,
@@ -28,14 +27,33 @@ import {
   validateDateTimeRange,
   validateTaskDesc,
 } from '../../../util/validations';
+import MyBadge from '../../../components/MyBadge';
 
-const labels = [
-  { name: 'study', Color: 'indigo' },
+export type SeverityLevel = 'Low' | 'Moderate' | 'Critical' | 'Urgent';
+
+export const labels = [
+  { name: 'study', color: 'indigo' },
   { name: 'work', color: 'cyan' },
   { name: 'health', color: 'orange' },
   { name: 'dating', color: 'crimson' },
   { name: 'entertainment', color: 'yellow' },
 ];
+export const severitys: Record<SeverityLevel, number> = {
+  Low: 1,
+  Moderate: 2,
+  Critical: 3,
+  Urgent: 4,
+};
+const severitysArr = Object.entries(severitys).map(([name, amount]) => ({
+  name,
+  amount,
+}));
+
+export const renderIcons = (amount: number) => {
+  return Array.from({ length: amount }, (_, index) => (
+    <BlendingModeIcon key={index} />
+  ));
+};
 
 const TaskPanel = () => {
   // Get today's date
@@ -154,8 +172,6 @@ const TaskPanel = () => {
       } else {
         hanldeInputTimeRangeError();
       }
-      // console.log('context');
-      // console.log(context.validationError);
     };
   };
 
@@ -172,8 +188,6 @@ const TaskPanel = () => {
       } else {
         hanldeInputDateRangeError(context.validationError);
       }
-      // console.log('context');
-      // console.log(context.validationError);
     };
   };
 
@@ -270,109 +284,37 @@ const TaskPanel = () => {
                   onValueChange={handleSeverityChange}
                   columns={{ initial: '1', sm: '4' }}
                 >
-                  <RadioCards.Item value='Low'>
-                    <Flex
-                      direction='column'
-                      align='center'
-                      width='100%'
-                      gapY={'1'}
-                    >
-                      <Text>Low</Text>
-                      <Flex>
-                        <BlendingModeIcon />
+                  {severitysArr.map((severity) => (
+                    <RadioCards.Item key={severity.name} value={severity.name}>
+                      <Flex
+                        direction='column'
+                        align='center'
+                        width='100%'
+                        gapY={'1'}
+                      >
+                        <Text>{severity.name}</Text>
+                        <Flex>{renderIcons(severity.amount)}</Flex>
                       </Flex>
-                    </Flex>
-                  </RadioCards.Item>
-                  <RadioCards.Item value='Moderate'>
-                    <Flex
-                      direction='column'
-                      align='center'
-                      width='100%'
-                      gapY={'1'}
-                    >
-                      <Text>Moderate</Text>
-                      <Flex>
-                        <BlendingModeIcon />
-                        <BlendingModeIcon />
-                      </Flex>
-                    </Flex>
-                  </RadioCards.Item>
-                  <RadioCards.Item value='Critical'>
-                    <Flex
-                      direction='column'
-                      align='center'
-                      width='100%'
-                      gapY={'1'}
-                    >
-                      <Text>Critical</Text>
-                      <Flex>
-                        <BlendingModeIcon />
-                        <BlendingModeIcon />
-                        <BlendingModeIcon />
-                      </Flex>
-                    </Flex>
-                  </RadioCards.Item>
-                  <RadioCards.Item value='Urgent'>
-                    <Flex
-                      direction='column'
-                      align='center'
-                      width='100%'
-                      gapY={'1'}
-                    >
-                      <Text>Urgent</Text>
-                      <Flex>
-                        <BlendingModeIcon />
-                        <BlendingModeIcon />
-                        <BlendingModeIcon />
-                        <BlendingModeIcon />
-                      </Flex>
-                    </Flex>
-                  </RadioCards.Item>
+                    </RadioCards.Item>
+                  ))}
                 </RadioCards.Root>
               </div>
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Labels *</Heading>
                 <Flex wrap='wrap' gapX={'2'} gapY={'2'}>
-                  <Badge
-                    onClick={() => handleLabelClick(0)}
-                    variant={selectedLabelValue === 0 ? 'solid' : 'outline'}
-                    color='indigo'
-                    size={'3'}
-                  >
-                    study
-                  </Badge>
-                  <Badge
-                    onClick={() => handleLabelClick(1)}
-                    variant={selectedLabelValue === 1 ? 'solid' : 'outline'}
-                    color='cyan'
-                    size={'3'}
-                  >
-                    work
-                  </Badge>
-                  <Badge
-                    onClick={() => handleLabelClick(2)}
-                    variant={selectedLabelValue === 2 ? 'solid' : 'outline'}
-                    color='orange'
-                    size={'3'}
-                  >
-                    health
-                  </Badge>
-                  <Badge
-                    onClick={() => handleLabelClick(3)}
-                    variant={selectedLabelValue === 3 ? 'solid' : 'outline'}
-                    color='crimson'
-                    size={'3'}
-                  >
-                    dating
-                  </Badge>
-                  <Badge
-                    onClick={() => handleLabelClick(4)}
-                    variant={selectedLabelValue === 4 ? 'solid' : 'outline'}
-                    color='yellow'
-                    size={'3'}
-                  >
-                    entertainment
-                  </Badge>
+                  {labels.map((label, index) => (
+                    <MyBadge
+                      label={label.name}
+                      key={index}
+                      onClick={() => handleLabelClick(index)}
+                      variant={
+                        selectedLabelValue === index ? 'solid' : 'outline'
+                      }
+                      size={'3'}
+                    >
+                      <div> {label.name}</div>
+                    </MyBadge>
+                  ))}
                 </Flex>
               </div>
               <div>

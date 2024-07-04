@@ -12,7 +12,6 @@ import {
   Card,
   Flex,
   Checkbox,
-  Badge,
   ScrollArea,
   IconButton,
   Spinner,
@@ -21,7 +20,6 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
 import {
   ActivityLogIcon,
-  BlendingModeIcon,
   Cross2Icon,
   MagnifyingGlassIcon,
   Pencil1Icon,
@@ -32,8 +30,18 @@ import {
   showTaskPanel,
 } from '../../../store/modules/taskSlice';
 import { useEffect } from 'react';
+import MyBadge from '../../../components/MyBadge';
+import { renderIcons, severitys, type SeverityLevel } from '../TaskPanel';
 
 function TodayTasks() {
+  // const [selectedLevel, setSelectedLevel] = useState('Low');
+  // const [selectedLabel, setSelectedLabel] = useState('study');
+  // const [selectedCompletence, setCompletence] = useState('all');
+  // const [selectedSortWay, setSelectedSortWay] = useState(
+  //   'scheduledStartTime&&asc',
+  // );
+  // const [searchContent, setSearchContent] = useState('');
+
   dayjs.extend(LocalizedFormat);
   const formattedDate = dayjs().format('LL');
 
@@ -47,6 +55,11 @@ function TodayTasks() {
     dispatch(showTaskPanel());
   };
 
+  const handleLevelChange = () => {
+    return (value: string) => {
+      console.log(value);
+    };
+  };
   /**
    * fetch data from server and update states together:
    */
@@ -113,7 +126,10 @@ function TodayTasks() {
                   </TextField.Root>
                 </div>
                 <div className='flex items-center gap-3'>
-                  <Select.Root defaultValue='Low'>
+                  <Select.Root
+                    defaultValue='Low'
+                    onValueChange={handleLevelChange()}
+                  >
                     <Select.Trigger />
                     <Select.Content position='popper'>
                       <Select.Item value='Low'>low</Select.Item>
@@ -222,33 +238,18 @@ function TodayTasks() {
                             </div>
                             <div className='flex gap-6 items-center'>
                               <div className='flex gap-2 items-center'>
-                                <Badge
-                                  variant='soft'
-                                  color={`${
-                                    task.label === 'dating'
-                                      ? 'crimson'
-                                      : task.label === 'study'
-                                        ? 'indigo'
-                                        : task.label === 'work'
-                                          ? 'cyan'
-                                          : task.label === 'health'
-                                            ? 'orange'
-                                            : 'yellow'
-                                  }`}
-                                >
+                                <MyBadge label={task.label} variant={'soft'}>
                                   &nbsp;&nbsp;{task.label}&nbsp;&nbsp;
-                                </Badge>
-
+                                </MyBadge>
                                 <Text
                                   color='indigo'
                                   size='1'
                                   className='flex items-center gap-1'
                                 >
                                   <Flex>
-                                    <BlendingModeIcon />
-                                    <BlendingModeIcon />
-                                    <BlendingModeIcon />
-                                    <BlendingModeIcon />
+                                    {renderIcons(
+                                      severitys[task.severity as SeverityLevel],
+                                    )}
                                   </Flex>
                                   {task.severity.toUpperCase()}
                                 </Text>
