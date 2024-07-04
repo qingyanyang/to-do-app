@@ -128,7 +128,7 @@ function Login() {
         const accessToken = await res.user.getIdToken();
         setUID(res.user.uid);
         setToken(accessToken);
-        setUserEmail(res.user.email ? res.user.email : '');
+        setUserEmail(res.user.email ? res.user.email : 'example@email.com');
         setProfileURL(
           res.user.photoURL
             ? res.user.photoURL
@@ -280,7 +280,7 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
           : 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop';
 
         // create user document
-        await FirebaseFirestoreService.createDocument(
+        await FirebaseFirestoreService.createDocumentWithName(
           'users',
           {
             email: userEmail,

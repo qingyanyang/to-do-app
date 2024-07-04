@@ -14,6 +14,7 @@ import {
   Badge,
   Button,
   Spinner,
+  AlertDialog,
 } from '@radix-ui/themes';
 
 import dayjs from 'dayjs';
@@ -23,8 +24,10 @@ import {
   createTaskAsync,
   hideTaskPanel,
 } from '../../../store/modules/taskSlice';
-import { validateTaskDesc } from '../../../util/validations';
-import { getUID } from '../../../util/localStorageFucs';
+import {
+  validateDateTimeRange,
+  validateTaskDesc,
+} from '../../../util/validations';
 
 const labels = [
   { name: 'study', Color: 'indigo' },
@@ -35,15 +38,23 @@ const labels = [
 ];
 
 const TaskPanel = () => {
+  // Get today's date
+  const today = dayjs();
+  // Calculate the max date as 7 days from today
+  const maxDate = today.add(7, 'day');
+
   const [desc, setDesc] = useState('');
   const [counter, setCounter] = useState(0);
-  const [startScheduleTime, setStartScheduleTime] = useState(dayjs());
-  const [endScheduleTime, setEndScheduleTime] = useState(dayjs());
-  const [startScheduleDate, setStartScheduleDate] = useState(dayjs());
-  const [endScheduleDate, setEndScheduleDate] = useState(dayjs());
+  const [startScheduleTime, setStartScheduleTime] = useState(today);
+  const [endScheduleTime, setEndScheduleTime] = useState(today);
+  const [startScheduleDate, setStartScheduleDate] = useState(today);
+  const [endScheduleDate, setEndScheduleDate] = useState(today);
   const [selectedSeverityValue, setSelectedSeverityValue] = useState('Low');
   const [selectedLabelValue, setSelectedLabelValue] = useState(0);
   const [descErrorMsg, setDescErrorMsg] = useState('');
+  const [timeErrorMsg, setTimeErrorMsg] = useState('');
+  const [dateErrorMsg, setDateErrorMsg] = useState('');
+  const [timeExpired, setTimeExpired] = useState(false);
 
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.task);
@@ -51,10 +62,10 @@ const TaskPanel = () => {
   const onSuccess = () => {
     setDesc('');
     setCounter(0);
-    setStartScheduleTime(dayjs());
-    setEndScheduleTime(dayjs());
-    setStartScheduleDate(dayjs());
-    setEndScheduleDate(dayjs());
+    setStartScheduleTime(today);
+    setEndScheduleTime(today);
+    setStartScheduleDate(today);
+    setEndScheduleDate(today);
     setSelectedSeverityValue('Low');
     setSelectedLabelValue(0);
   };
@@ -67,33 +78,59 @@ const TaskPanel = () => {
     console.log(endScheduleDate);
     console.log(selectedSeverityValue);
     console.log(labels[selectedLabelValue].name);
-    handleDescValidation();
-    if (descErrorMsg === '') {
-      const uid = getUID();
-      if (!uid) {
-        throw new Error('Please check the uid');
-      }
-      dispatch(
-        createTaskAsync(
-          {
-            uid: uid,
-            desc: desc,
-            label: labels[selectedLabelValue].name,
-            severity: selectedSeverityValue,
-            scheduledStartTime: startScheduleTime,
-            scheduledEndTime: endScheduleTime,
-            scheduledStartDate: startScheduleDate,
-            scheduledEndDate: endScheduleDate,
-            isCompleted: false,
-          },
-          onSuccess,
-        ),
+
+    const newDescErrorMsg = validateTaskDesc(desc);
+    setDescErrorMsg(newDescErrorMsg);
+
+    if (newDescErrorMsg === '' && timeErrorMsg === '' && dateErrorMsg === '') {
+      const checkExpire = validateDateTimeRange(
+        startScheduleDate,
+        startScheduleTime,
       );
+      setTimeExpired(checkExpire);
+
+      if (!checkExpire) {
+        dispatch(
+          createTaskAsync(
+            {
+              desc: desc,
+              label: labels[selectedLabelValue].name,
+              severity: selectedSeverityValue,
+              scheduledStartTime: startScheduleTime,
+              scheduledEndTime: endScheduleTime,
+              scheduledStartDate: startScheduleDate,
+              scheduledEndDate: endScheduleDate,
+            },
+            onSuccess,
+          ),
+        );
+      }
     }
   };
+
   const handleDescValidation = () => {
     const errorMsg = validateTaskDesc(desc);
     setDescErrorMsg(errorMsg);
+  };
+
+  const hanldeInputTimeRangeError = () => {
+    setTimeErrorMsg('Time selected in invalid range');
+  };
+
+  const hanldeInputDateRangeError = (error: string[]) => {
+    if (error[0] === 'invalidRange' || error[1] === 'invalidRange') {
+      setDateErrorMsg('Date selected in invalid range');
+    }
+    if (
+      error[0] === 'minDate' ||
+      error[1] === 'minDate' ||
+      error[0] === 'maxDate' ||
+      error[1] === 'maxDate'
+    ) {
+      setDateErrorMsg(
+        'Date should start from today and cannot over 7 days from today.',
+      );
+    }
   };
 
   const handleTextAreaOnChange = () => {
@@ -108,7 +145,17 @@ const TaskPanel = () => {
     return (value: any, context: any) => {
       setStartScheduleTime(value[0]);
       setEndScheduleTime(value[1]);
-      console.log(context);
+      if (
+        context.validationError &&
+        !context.validationError[0] &&
+        !context.validationError[1]
+      ) {
+        setTimeErrorMsg('');
+      } else {
+        hanldeInputTimeRangeError();
+      }
+      // console.log('context');
+      // console.log(context.validationError);
     };
   };
 
@@ -116,8 +163,17 @@ const TaskPanel = () => {
     return (value: any, context: any) => {
       setStartScheduleDate(dayjs(value[0]));
       setEndScheduleDate(dayjs(value[1]));
-
-      console.log(context);
+      if (
+        context.validationError &&
+        !context.validationError[0] &&
+        !context.validationError[1]
+      ) {
+        setDateErrorMsg('');
+      } else {
+        hanldeInputDateRangeError(context.validationError);
+      }
+      // console.log('context');
+      // console.log(context.validationError);
     };
   };
 
@@ -178,6 +234,13 @@ const TaskPanel = () => {
                   value={[startScheduleTime, endScheduleTime]}
                   onChange={getTimeRangeValue()}
                 />
+                {timeErrorMsg ? (
+                  <Text color='red' size='2'>
+                    {timeErrorMsg}
+                  </Text>
+                ) : (
+                  <Box height='16px'></Box>
+                )}
               </div>
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Date Schedule *</Heading>
@@ -187,8 +250,17 @@ const TaskPanel = () => {
                   }}
                   variant={'standard'}
                   value={[startScheduleDate, endScheduleDate]}
+                  minDate={today}
+                  maxDate={maxDate}
                   onChange={getDateRangeValue()}
                 />
+                {dateErrorMsg ? (
+                  <Text color='red' size='2'>
+                    {dateErrorMsg}
+                  </Text>
+                ) : (
+                  <Box height='16px'></Box>
+                )}
               </div>
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Severity *</Heading>
@@ -304,11 +376,34 @@ const TaskPanel = () => {
                 </Flex>
               </div>
               <div>
-                <Button variant='classic' size='2' onClick={handleCreateTask}>
-                  <Spinner loading={loading}>
-                    &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
-                  </Spinner>
-                </Button>
+                <AlertDialog.Root>
+                  <AlertDialog.Trigger>
+                    <Button
+                      variant='classic'
+                      size='2'
+                      onClick={handleCreateTask}
+                    >
+                      <Spinner loading={loading}>
+                        &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
+                      </Spinner>
+                    </Button>
+                  </AlertDialog.Trigger>
+                  {timeExpired && (
+                    <AlertDialog.Content maxWidth='450px'>
+                      <AlertDialog.Title>Time expired</AlertDialog.Title>
+                      <AlertDialog.Description size='2'>
+                        the scheduled start time is out of date, please reset.
+                      </AlertDialog.Description>
+                      <Flex gap='3' mt='4' justify='end'>
+                        <AlertDialog.Cancel>
+                          <Button variant='soft' color='red'>
+                            OK
+                          </Button>
+                        </AlertDialog.Cancel>
+                      </Flex>
+                    </AlertDialog.Content>
+                  )}
+                </AlertDialog.Root>
               </div>
             </div>
           </ScrollArea>
