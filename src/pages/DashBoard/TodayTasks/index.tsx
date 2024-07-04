@@ -76,7 +76,9 @@ function TodayTasks() {
   useEffect(() => {
     // get labels
     // get tasks
-    dispatch(getTodayTasksAsync());
+    if (!todayTasks) {
+      dispatch(getTodayTasksAsync());
+    }
   }, []);
 
   return (
