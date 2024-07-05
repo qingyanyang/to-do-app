@@ -12,6 +12,7 @@ import {
   endAt,
   serverTimestamp,
   setDoc,
+  orderBy,
 } from 'firebase/firestore';
 
 // create task
@@ -44,7 +45,8 @@ const getDocumentByDocumentName = async (
 // query daily tasks
 const getDocumentsFromLastCollection = async (fromCollection: string) => {
   const collectionRef = collection(db, fromCollection);
-  const docsSnapshot = await getDocs(collectionRef);
+  const q = query(collectionRef, orderBy('scheduledStartTime'));
+  const docsSnapshot = await getDocs(q);
   if (docsSnapshot.empty) {
     return null;
   }

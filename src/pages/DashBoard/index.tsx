@@ -22,7 +22,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers-pro';
 import TaskPanel from './TaskPanel';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { showTaskPanel } from '../../store/modules/taskSlice';
+import { showTaskPanel, setRevertState } from '../../store/modules/taskSlice';
 
 const navMenu = [
   {
@@ -67,6 +67,7 @@ function DashBoard() {
       removeUserEmail();
       removeToken();
       removeProfileURL();
+      dispatch(setRevertState());
       //redirect
       navigate('/login');
     } catch (error) {

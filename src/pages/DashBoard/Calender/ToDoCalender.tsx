@@ -74,8 +74,8 @@ const ToDoCalender: React.FC = () => {
     const content = (
       <div className='overflow-y-auto max-h-40'>
         <ul className='events flex flex-col gap-1'>
-          {listData.map((item) => (
-            <Card>
+          {listData.map((item, index) => (
+            <Card key={index}>
               <Flex align={'center'} justify={'between'} gap='1'>
                 <li key={item.content}>
                   <Badge

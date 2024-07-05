@@ -34,15 +34,15 @@ interface StampTask {
   isExpired?: boolean;
 }
 
-interface SearchMethod {
+export type SearchMethod = {
   searchedName: string;
   filterMethod: {
     severity: string | null;
     label: string | null;
-    isCompleted: boolean;
+    isCompleted: boolean | null;
   };
   sortMethod: { way: string; atz: boolean }; // default value: 'scheduledTime true'
-}
+};
 
 interface TaskState {
   taskPanelVisible: boolean;
@@ -100,6 +100,13 @@ export const taskSlice = createSlice({
       const { severity, label, isCompleted } = filterMethod;
       const { way, atz } = sortMethod;
 
+      // console.log(searchedName);
+      // console.log(severity);
+      // console.log(label);
+      // console.log(isCompleted);
+      // console.log(way);
+      // console.log(atz);
+
       let resultTasks = [...state.todayTasks];
 
       if (resultTasks) {
@@ -125,6 +132,8 @@ export const taskSlice = createSlice({
             (task) => task.isCompleted === isCompleted,
           );
         }
+
+        console.log(resultTasks);
 
         resultTasks.sort((a, b) => {
           let comparison = 0;
@@ -230,6 +239,16 @@ export const taskSlice = createSlice({
     setSuccess: (state, action: PayloadAction<string | null>) => {
       state.success = action.payload;
     },
+    setRevertState: (state) => {
+      state.taskPanelVisible = false;
+      state.todayTasks = [];
+      state.todaySearchResultTasks = [];
+      state.todayTasksComplete = { total: 0, completedNum: 0 };
+      state.editTaskContent = null;
+      state.loading = false;
+      state.error = null;
+      state.success = null;
+    },
   },
 });
 
@@ -242,6 +261,7 @@ export const {
   setLoading,
   setError,
   setSuccess,
+  setRevertState,
 } = taskSlice.actions;
 
 export const createTaskAsync =
@@ -319,6 +339,7 @@ export const createTaskAsync =
       dispatch(setSuccess('Task created successfully!'));
       if (onSuccess) onSuccess();
       // Additional actions like updating tasks
+      console.log('isTodayInDuration' + isTodayInDuration);
       if (isTodayInDuration) {
         dispatch(getTodayTasksAsync());
       }
