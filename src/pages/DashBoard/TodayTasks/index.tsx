@@ -284,7 +284,7 @@ function TodayTasks() {
                 </TextField.Slot>
               </TextField.Root>
             </div>
-            <div className='flex items-center gap-3'>
+            <div className='flex items-center gap-3 flex-wrap'>
               <Select.Root
                 value={selectedLevel ? selectedLevel : ''}
                 onValueChange={handleLevelChange()}
