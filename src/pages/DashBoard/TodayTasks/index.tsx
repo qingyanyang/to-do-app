@@ -381,7 +381,7 @@ function TodayTasks() {
                               }
                             >
                               <Checkbox
-                                size='3'
+                                size={'3'}
                                 checked={task.isCompleted}
                                 onClick={handleTaskCardClick(
                                   task.taskId ? task.taskId : '',
@@ -393,7 +393,7 @@ function TodayTasks() {
                             <div className='flex flex-col'>
                               <Text
                                 as='div'
-                                size='2'
+                                size='3'
                                 weight='bold'
                                 className={`${task.isCompleted && 'text-brand line-through'} short-text-ellipsis`}
                               >
@@ -403,30 +403,38 @@ function TodayTasks() {
                                 className='flex gap-2'
                                 as='div'
                                 color='gray'
-                                size='1'
+                                size='2'
                               >
                                 {dayjs(task.scheduledStartTime).format('LT')}-
                                 {dayjs(task.scheduledEndTime).format('LT')}
                               </Text>
                             </div>
                           </div>
-                          <div className='flex gap-2 tablet:hidden'>
+                          <div className='flex gap-4 tablet:hidden'>
                             <IconButton
                               variant='soft'
-                              size={'1'}
+                              size={{ initial: '4', xs: '3' }}
                               onClick={handleTaskEditClick(task)}
                             >
                               <Pencil1Icon />
                             </IconButton>
-                            <IconButton
-                              variant='outline'
-                              size={'1'}
-                              onClick={handleTaskDeleteClick(
-                                task.taskId ? task.taskId : '',
-                              )}
+                            <Spinner
+                              loading={
+                                taskClicked === task.taskId
+                                  ? loading.deleteTaskLoading
+                                  : false
+                              }
                             >
-                              <Cross2Icon />
-                            </IconButton>
+                              <IconButton
+                                variant='outline'
+                                size={{ initial: '4', xs: '3' }}
+                                onClick={handleTaskDeleteClick(
+                                  task.taskId ? task.taskId : '',
+                                )}
+                              >
+                                <Cross2Icon />
+                              </IconButton>
+                            </Spinner>
                           </div>
                         </div>
                         <div className='flex gap-6 items-center'>
@@ -450,7 +458,7 @@ function TodayTasks() {
                           <div className=' hidden tablet:flex gap-2'>
                             <IconButton
                               variant='soft'
-                              size={'1'}
+                              size={{ initial: '4', xs: '2' }}
                               onClick={handleTaskEditClick(task)}
                             >
                               <Pencil1Icon />
@@ -464,7 +472,7 @@ function TodayTasks() {
                             >
                               <IconButton
                                 variant='outline'
-                                size={'1'}
+                                size={{ initial: '4', xs: '2' }}
                                 onClick={handleTaskDeleteClick(task.taskId)}
                               >
                                 <Cross2Icon />
@@ -479,7 +487,7 @@ function TodayTasks() {
               </div>
             </ScrollArea>
             <Link href='#' onClick={() => dispatch(showTaskPanel(null))}>
-              <Text className='flex gap-2 items-center'>
+              <Text className='flex gap-2 items-center mb-20'>
                 <AddCircleIcon />
                 Add Tasks
               </Text>
