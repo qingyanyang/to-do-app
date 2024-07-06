@@ -18,8 +18,14 @@ import {
 } from '@radix-ui/themes';
 import React, { useState, ReactNode } from 'react';
 import { FirebaseAuthService } from '../../api/firebaseService/auth';
+import { FirebaseFirestoreService } from '../../api/firebaseService/db';
 import { useNavigate } from 'react-router-dom';
-import { setProfileURL, setToken } from '../../util/localStorageFucs';
+import {
+  setProfileURL,
+  setToken,
+  setUID,
+  setUserEmail,
+} from '../../util/localStorageFucs';
 
 interface TodoInputProps {
   label: string;
@@ -34,7 +40,7 @@ interface TodoInputProps {
   error?: string;
 }
 
-const TodoInput: React.FC<TodoInputProps> = ({
+export const TodoInput: React.FC<TodoInputProps> = ({
   label,
   instruction = null,
   placeholder,
@@ -120,13 +126,10 @@ function Login() {
         setPassword('');
         // save info
         const accessToken = await res.user.getIdToken();
+        setUID(res.user.uid);
         setToken(accessToken);
-        setEmail(res.user.email ? res.user.email : '');
-        setProfileURL(
-          res.user.providerData[0].photoURL
-            ? res.user.providerData[0].photoURL
-            : '',
-        );
+        setUserEmail(res.user.email ? res.user.email : 'example@email.com');
+        setProfileURL(res.user.photoURL);
         // redirect
         navigate('/');
       } catch (error) {
@@ -140,13 +143,10 @@ function Login() {
       const res = await FirebaseAuthService.loginWithGoogle();
       // save info
       const accessToken = await res.user.getIdToken();
+      setUID(res.user.uid);
       setToken(accessToken);
-      setEmail(res.user.email ? res.user.email : '');
-      setProfileURL(
-        res.user.providerData[0].photoURL
-          ? res.user.providerData[0].photoURL
-          : '',
-      );
+      setUserEmail(res.user.email ? res.user.email : 'user');
+      setProfileURL(res.user.photoURL);
       // redirect
       navigate('/');
     } catch (error) {
@@ -209,7 +209,7 @@ function Login() {
                   Create an account
                 </Button>
                 <Button onClick={handleLogin}>Sign in</Button>
-                <Button onClick={handleLoginWithGoogle}>
+                <Button variant='soft' onClick={handleLoginWithGoogle}>
                   <FontAwesomeIcon icon={faGoogle} />
                 </Button>
               </Flex>
@@ -264,7 +264,22 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
     //validations
     if (!emailErrorMSG && !passwordErrorMSG && !passwordConfirmErrorMSG) {
       try {
-        await FirebaseAuthService.registerUser(email, password);
+        const res = await FirebaseAuthService.registerUser(email, password);
+        const userEmail = res.user.email;
+        const uid = res.user.uid;
+        const photoURL = res.user.photoURL;
+
+        // create user document
+        await FirebaseFirestoreService.createDocumentWithName(
+          'users',
+          {
+            email: userEmail,
+            uid: uid,
+            photoURL: photoURL,
+          },
+          uid,
+        );
+
         setEmail('');
         setPassword('');
         setConfirmPassword('');

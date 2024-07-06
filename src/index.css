@@ -29,6 +29,9 @@ body {
 
 /* customized css and tailwindcss class*/
 @layer components {
+  .z-top {
+    z-index: 999999999 !important;
+  }
   .short-label-ellipsis {
     @apply whitespace-nowrap text-ellipsis max-w-20 overflow-hidden;
   }

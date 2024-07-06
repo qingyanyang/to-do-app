@@ -2,8 +2,7 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 import NotFound from './pages/NotFoundPage';
 import DashBoard from './pages/DashBoard';
 import TodayTasks from './pages/DashBoard/TodayTasks';
-import ScheduledTasks from './pages/DashBoard/ScheduledTasks';
-import PreferencesTasks from './pages/DashBoard/PreferencesTasks';
+import Calender from './pages/DashBoard/Calender';
 import Settings from './pages/DashBoard/Settings';
 import Login from './pages/Login';
 import { ReactNode } from 'react';
@@ -47,12 +46,8 @@ const router = createBrowserRouter([
         element: <TodayTasks />,
       },
       {
-        path: 'scheduled-tasks',
-        element: <ScheduledTasks />,
-      },
-      {
-        path: 'preferences-tasks',
-        element: <PreferencesTasks />,
+        path: 'calender',
+        element: <Calender />,
       },
       {
         path: 'settings',
