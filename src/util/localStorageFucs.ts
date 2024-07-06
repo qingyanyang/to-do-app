@@ -40,8 +40,8 @@ const removeUserEmail = () => {
 const getProfileURL = () => {
   return localStorage.getItem(PRO_URL_KEY);
 };
-const setProfileURL = (proURL: string) => {
-  localStorage.setItem(PRO_URL_KEY, proURL);
+const setProfileURL = (proURL: string | null) => {
+  localStorage.setItem(PRO_URL_KEY, proURL ? proURL : '');
 };
 const removeProfileURL = () => {
   localStorage.removeItem(PRO_URL_KEY);

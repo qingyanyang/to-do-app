@@ -15,6 +15,7 @@ import {
   ScrollArea,
   IconButton,
   Spinner,
+  Skeleton,
 } from '@radix-ui/themes';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
@@ -29,7 +30,10 @@ import {
   getTodayTasksAsync,
   showTaskPanel,
   getTodaySearchResultTasks,
-  SearchMethod,
+  type SearchMethod,
+  editTaskAsync,
+  daleteTaskByTaskIdAsync,
+  Task,
 } from '../../../store/modules/taskSlice';
 import { useEffect, useState } from 'react';
 import MyBadge from '../../../components/MyBadge';
@@ -46,19 +50,19 @@ function TodayTasks() {
   );
   const [searchContent, setSearchContent] = useState('');
   const [isSearch, setIsSearch] = useState(false);
+  const [taskClicked, setTaskClicked] = useState('');
 
   dayjs.extend(LocalizedFormat);
   const formattedDate = dayjs().format('LL');
 
   const dispatch = useAppDispatch();
-  const { loading, todayTasks, todayTasksComplete, todaySearchResultTasks } =
-    useAppSelector((state) => state.task);
-
-  const handleTaskCardClick = () => {
-    // show panel
-    dispatch(showTaskPanel());
-  };
-
+  const {
+    loading,
+    todayTasks,
+    todayTasksComplete,
+    todaySearchResultTasks,
+    editTaskContent,
+  } = useAppSelector((state) => state.task);
   /**
    * const { searchedName, filterMethod, sortMethod } = action.payload;
       const { severity, label, isCompleted } = filterMethod;
@@ -112,13 +116,6 @@ function TodayTasks() {
         dispatch(
           getTodaySearchResultTasks(formatedSearchContent as SearchMethod),
         );
-        console.log(
-          newContent +
-            selectedLevel +
-            selectedLabel +
-            selectedCompletence +
-            selectedSortWay,
-        );
       } else {
         setIsSearch(false);
         setSearchContent(newContent);
@@ -141,13 +138,6 @@ function TodayTasks() {
       dispatch(
         getTodaySearchResultTasks(formatedSearchContent as SearchMethod),
       );
-      console.log(
-        searchContent +
-          value +
-          selectedLabel +
-          selectedCompletence +
-          selectedSortWay,
-      );
     };
   };
 
@@ -165,13 +155,6 @@ function TodayTasks() {
       );
       dispatch(
         getTodaySearchResultTasks(formatedSearchContent as SearchMethod),
-      );
-      console.log(
-        searchContent +
-          selectedLevel +
-          value +
-          selectedCompletence +
-          selectedSortWay,
       );
     };
   };
@@ -191,9 +174,6 @@ function TodayTasks() {
       dispatch(
         getTodaySearchResultTasks(formatedSearchContent as SearchMethod),
       );
-      console.log(
-        searchContent + selectedLevel + selectedLabel + value + selectedSortWay,
-      );
     };
   };
 
@@ -212,13 +192,33 @@ function TodayTasks() {
       dispatch(
         getTodaySearchResultTasks(formatedSearchContent as SearchMethod),
       );
-      console.log(
-        searchContent +
-          selectedLevel +
-          selectedLabel +
-          selectedCompletence +
-          value,
+    };
+  };
+
+  const handleTaskCardClick = (taskId: string, isCompleted: boolean) => {
+    return () => {
+      const isTaskCompeleted = !isCompleted;
+      setTaskClicked(taskId);
+      dispatch(
+        editTaskAsync(taskId, { isCompleted: isTaskCompeleted }, new Date()),
       );
+    };
+  };
+
+  const handleTaskEditClick = (task: Task) => {
+    return () => {
+      dispatch(showTaskPanel(task));
+      console.log('task');
+      console.log(task);
+      console.log('editTaskContent');
+      console.log(editTaskContent);
+    };
+  };
+
+  const handleTaskDeleteClick = (taskId: string) => {
+    return () => {
+      setTaskClicked(taskId);
+      dispatch(daleteTaskByTaskIdAsync(taskId, new Date()));
     };
   };
   /**
@@ -255,7 +255,8 @@ function TodayTasks() {
               <Progress
                 size='3'
                 value={
-                  todayTasksComplete.completedNum / todayTasksComplete.total
+                  (todayTasksComplete.completedNum / todayTasksComplete.total) *
+                  100
                 }
               />
             </Box>
@@ -269,231 +270,260 @@ function TodayTasks() {
         <Callout.Text size='3'>
           Welcome to
           <Link href='#'>
-            <Text className='font-semibold'>To do list 1.0.1</Text>
+            <Text className='font-semibold'> To Do List </Text>
           </Link>
           ~~ Start to plan from today !
         </Callout.Text>
       </Callout.Root>
       <div className='flex flex-col gap-8 h-full'>
-        <Spinner loading={loading}>
-          {todayTasks && todayTasks.length > 0 ? (
-            <div className='flex flex-col gap-4'>
-              <Text className='text-xl font-semibold'>Today's Tasks</Text>
-              <div className='flex flex-col justify-between gap-3 items-start tablet:flex-row tablet:items-center'>
-                <div className='flex-1 w-full'>
-                  <TextField.Root
-                    placeholder='Search task'
-                    radius='large'
-                    value={searchContent}
-                    onChange={handleSearchContentChange()}
-                  >
-                    <TextField.Slot>
-                      <MagnifyingGlassIcon height='16' width='16' />
-                    </TextField.Slot>
-                  </TextField.Root>
-                </div>
-                <div className='flex items-center gap-3'>
-                  <Select.Root
-                    value={selectedLevel ? selectedLevel : ''}
-                    onValueChange={handleLevelChange()}
-                  >
-                    <Select.Trigger placeholder='severity' />
-                    <Select.Content position='popper'>
-                      <Select.Item value='all'>all</Select.Item>
-                      <Select.Item value='Low'>low</Select.Item>
-                      <Select.Item value='Moderate'>moderate</Select.Item>
-                      <Select.Item value='Critical'>critical</Select.Item>
-                      <Select.Item value='Urgent'>urgent</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                  <Select.Root
-                    value={selectedLabel ? selectedLabel : ''}
-                    onValueChange={handleLabelChange()}
-                  >
-                    <Select.Trigger placeholder='label' />
-                    <Select.Content position='popper'>
-                      <Select.Item value='all'>all</Select.Item>
-                      <Select.Item value='study'>study</Select.Item>
-                      <Select.Item value='work'>work</Select.Item>
-                      <Select.Item value='health'>health</Select.Item>
-                      <Select.Item value='dating'>dating</Select.Item>
-                      <Select.Item value='entertainment'>
-                        entertainment
-                      </Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                  <Select.Root
-                    value={selectedCompletence ? selectedCompletence : ''}
-                    onValueChange={handleCompletenceChange()}
-                  >
-                    <Select.Trigger placeholder='completence' />
-                    <Select.Content position='popper'>
-                      <Select.Item value='all'>all</Select.Item>
-                      <Select.Item value='true'>done</Select.Item>
-                      <Select.Item value='false'>unfinish</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                  <Select.Root
-                    value={selectedSortWay ? selectedSortWay : ''}
-                    onValueChange={handleSelectedSortWayChange()}
-                  >
-                    <Select.Trigger placeholder='sort way' />
-                    <Select.Content position='popper'>
-                      <Select.Item value='scheduledStartTime&&true'>
-                        start time ascending
-                      </Select.Item>
-                      <Select.Item value='scheduledStartTime&&false'>
-                        start time descending
-                      </Select.Item>
-                      <Select.Item value='totalTimeUse&&true'>
-                        time range ascending
-                      </Select.Item>
-                      <Select.Item value='totalTimeUse&&false'>
-                        time range descending
-                      </Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                </div>
-              </div>
-              <div>
-                <Text
-                  color='gray'
-                  size='1'
-                  className='flex items-center gap-2 mt-4'
+        <div className='flex flex-col gap-4'>
+          <Text className='text-xl font-semibold'>
+            <Skeleton loading={loading.getTaskLoading}>Today's Tasks</Skeleton>
+          </Text>
+          <div className='flex flex-col justify-between gap-3 items-start tablet:flex-row tablet:items-center'>
+            <Skeleton loading={loading.getTaskLoading}>
+              <div className='flex-1 w-full'>
+                <TextField.Root
+                  placeholder='Search task'
+                  radius='large'
+                  value={searchContent}
+                  onChange={handleSearchContentChange()}
                 >
-                  <ActivityLogIcon />
-                  {isSearch ? todaySearchResultTasks.length : todayTasks.length}
-                  &nbsp;Tasks
-                </Text>
+                  <TextField.Slot>
+                    <MagnifyingGlassIcon height='16' width='16' />
+                  </TextField.Slot>
+                </TextField.Root>
               </div>
-              <ScrollArea
-                type='hover'
-                scrollbars='vertical'
-                style={{ maxHeight: 280 }}
-              >
-                <div className='flex flex-col gap-3'>
-                  {(isSearch ? todaySearchResultTasks : todayTasks).map(
-                    (task) => (
-                      <Box key={task.desc}>
-                        <Card asChild variant='classic'>
-                          <label>
-                            <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
-                              <div className='flex gap-4 items-center justify-between'>
-                                <div className='flex gap-4 items-center'>
-                                  <Spinner loading={loading}>
-                                    <Checkbox size='3' defaultChecked />
-                                  </Spinner>
-                                  <div className='flex flex-col'>
-                                    <Text
-                                      as='div'
-                                      size='2'
-                                      weight='bold'
-                                      className='short-text-ellipsis'
-                                    >
-                                      {task.desc}
-                                    </Text>
-                                    <Text
-                                      className='flex gap-2'
-                                      as='div'
-                                      color='gray'
-                                      size='1'
-                                    >
-                                      {dayjs(task.scheduledStartTime).format(
-                                        'LT',
-                                      )}
-                                      -
-                                      {dayjs(task.scheduledEndTime).format(
-                                        'LT',
-                                      )}
-                                    </Text>
-                                  </div>
-                                </div>
-                                <div className='flex gap-2 tablet:hidden'>
-                                  <IconButton
-                                    variant='soft'
-                                    size={'1'}
-                                    onClick={handleTaskCardClick}
-                                  >
-                                    <Pencil1Icon />
-                                  </IconButton>
-                                  <IconButton variant='outline' size={'1'}>
-                                    <Cross2Icon />
-                                  </IconButton>
-                                </div>
-                              </div>
-                              <div className='flex gap-6 items-center'>
-                                <div className='flex gap-2 items-center'>
-                                  <MyBadge label={task.label} variant={'soft'}>
-                                    &nbsp;&nbsp;{task.label}&nbsp;&nbsp;
-                                  </MyBadge>
-                                  <Text
-                                    color='indigo'
-                                    size='1'
-                                    className='flex items-center gap-1'
-                                  >
-                                    <Flex>
-                                      {renderIcons(
-                                        severitys[
-                                          task.severity as SeverityLevel
-                                        ],
-                                      )}
-                                    </Flex>
-                                    {task.severity.toUpperCase()}
-                                  </Text>
-                                </div>
-                                <div className=' hidden tablet:flex gap-2'>
-                                  <IconButton
-                                    variant='soft'
-                                    size={'1'}
-                                    onClick={handleTaskCardClick}
-                                  >
-                                    <Pencil1Icon />
-                                  </IconButton>
-                                  <IconButton variant='outline' size={'1'}>
-                                    <Cross2Icon />
-                                  </IconButton>
-                                </div>
-                              </div>
-                            </div>
-                          </label>
-                        </Card>
-                      </Box>
-                    ),
-                  )}
-                </div>
-              </ScrollArea>
-              <Link href='#' onClick={() => dispatch(showTaskPanel())}>
-                <Text className='flex gap-2 items-center'>
+              <div className='flex items-center gap-3'>
+                <Select.Root
+                  value={selectedLevel ? selectedLevel : ''}
+                  onValueChange={handleLevelChange()}
+                >
+                  <Select.Trigger placeholder='severity' />
+                  <Select.Content position='popper'>
+                    <Select.Item value='all'>all</Select.Item>
+                    <Select.Item value='Low'>low</Select.Item>
+                    <Select.Item value='Moderate'>moderate</Select.Item>
+                    <Select.Item value='Critical'>critical</Select.Item>
+                    <Select.Item value='Urgent'>urgent</Select.Item>
+                  </Select.Content>
+                </Select.Root>
+                <Select.Root
+                  value={selectedLabel ? selectedLabel : ''}
+                  onValueChange={handleLabelChange()}
+                >
+                  <Select.Trigger placeholder='label' />
+                  <Select.Content position='popper'>
+                    <Select.Item value='all'>all</Select.Item>
+                    <Select.Item value='study'>study</Select.Item>
+                    <Select.Item value='work'>work</Select.Item>
+                    <Select.Item value='health'>health</Select.Item>
+                    <Select.Item value='dating'>dating</Select.Item>
+                    <Select.Item value='entertainment'>
+                      entertainment
+                    </Select.Item>
+                  </Select.Content>
+                </Select.Root>
+                <Select.Root
+                  value={selectedCompletence ? selectedCompletence : ''}
+                  onValueChange={handleCompletenceChange()}
+                >
+                  <Select.Trigger placeholder='completence' />
+                  <Select.Content position='popper'>
+                    <Select.Item value='all'>all</Select.Item>
+                    <Select.Item value='true'>done</Select.Item>
+                    <Select.Item value='false'>unfinish</Select.Item>
+                  </Select.Content>
+                </Select.Root>
+                <Select.Root
+                  value={selectedSortWay ? selectedSortWay : ''}
+                  onValueChange={handleSelectedSortWayChange()}
+                >
+                  <Select.Trigger placeholder='sort way' />
+                  <Select.Content position='popper'>
+                    <Select.Item value='scheduledStartTime&&true'>
+                      start time ascending
+                    </Select.Item>
+                    <Select.Item value='scheduledStartTime&&false'>
+                      start time descending
+                    </Select.Item>
+                    <Select.Item value='totalTimeUse&&true'>
+                      time range ascending
+                    </Select.Item>
+                    <Select.Item value='totalTimeUse&&false'>
+                      time range descending
+                    </Select.Item>
+                  </Select.Content>
+                </Select.Root>
+              </div>
+            </Skeleton>
+          </div>
+          <div>
+            <Text
+              color='gray'
+              size='1'
+              className='flex items-center gap-2 mt-4'
+            >
+              <Skeleton loading={loading.getTaskLoading}>
+                <ActivityLogIcon />
+                {isSearch ? todaySearchResultTasks.length : todayTasks.length}
+                &nbsp;Tasks
+              </Skeleton>
+            </Text>
+          </div>
+          <ScrollArea
+            type='hover'
+            scrollbars='vertical'
+            className='max-h-[280px]'
+          >
+            <div className='flex flex-col gap-3'>
+              {(isSearch ? todaySearchResultTasks : todayTasks).map((task) => (
+                <Skeleton loading={loading.createTaskLoading} key={task.taskId}>
+                  <Card
+                    variant='classic'
+                    className='hover:border-brand border border-transparent'
+                  >
+                    <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
+                      <div className='flex gap-4 items-center justify-between'>
+                        <div className='flex gap-4 items-center'>
+                          <Spinner
+                            loading={
+                              taskClicked === task.taskId
+                                ? loading.editTaskLoading
+                                : false
+                            }
+                          >
+                            <Checkbox
+                              size='3'
+                              checked={task.isCompleted}
+                              onClick={handleTaskCardClick(
+                                task.taskId ? task.taskId : '',
+                                task.isCompleted ? task.isCompleted : false,
+                              )}
+                            />
+                          </Spinner>
+
+                          <div className='flex flex-col'>
+                            <Text
+                              as='div'
+                              size='2'
+                              weight='bold'
+                              className={`${task.isCompleted && 'text-brand line-through'} short-text-ellipsis`}
+                            >
+                              {task.desc}
+                            </Text>
+                            <Text
+                              className='flex gap-2'
+                              as='div'
+                              color='gray'
+                              size='1'
+                            >
+                              {dayjs(task.scheduledStartTime).format('LT')}-
+                              {dayjs(task.scheduledEndTime).format('LT')}
+                            </Text>
+                          </div>
+                        </div>
+                        <div className='flex gap-2 tablet:hidden'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskEditClick(task)}
+                          >
+                            <Pencil1Icon />
+                          </IconButton>
+                          <IconButton
+                            variant='outline'
+                            size={'1'}
+                            onClick={handleTaskDeleteClick(
+                              task.taskId ? task.taskId : '',
+                            )}
+                          >
+                            <Cross2Icon />
+                          </IconButton>
+                        </div>
+                      </div>
+                      <div className='flex gap-6 items-center'>
+                        <div className='flex gap-2 items-center'>
+                          <MyBadge label={task.label} variant={'soft'}>
+                            &nbsp;&nbsp;{task.label}&nbsp;&nbsp;
+                          </MyBadge>
+                          <Text
+                            color='indigo'
+                            size='1'
+                            className='flex items-center gap-1'
+                          >
+                            <Flex>
+                              {renderIcons(
+                                severitys[task.severity as SeverityLevel],
+                              )}
+                            </Flex>
+                            {task.severity.toUpperCase()}
+                          </Text>
+                        </div>
+                        <div className=' hidden tablet:flex gap-2'>
+                          <IconButton
+                            variant='soft'
+                            size={'1'}
+                            onClick={handleTaskEditClick(task)}
+                          >
+                            <Pencil1Icon />
+                          </IconButton>
+                          <Spinner
+                            loading={
+                              taskClicked === task.taskId
+                                ? loading.deleteTaskLoading
+                                : false
+                            }
+                          >
+                            <IconButton
+                              variant='outline'
+                              size={'1'}
+                              onClick={handleTaskDeleteClick(task.taskId)}
+                            >
+                              <Cross2Icon />
+                            </IconButton>
+                          </Spinner>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Skeleton>
+              ))}
+            </div>
+          </ScrollArea>
+          <Skeleton loading={loading.getTaskLoading}>
+            <Link href='#' onClick={() => dispatch(showTaskPanel(null))}>
+              <Text className='flex gap-2 items-center'>
+                <AddCircleIcon />
+                Add Tasks
+              </Text>
+            </Link>
+          </Skeleton>
+        </div>
+        {todayTasks && todayTasks.length === 0 && !loading.getTaskLoading && (
+          <div className='flex flex-col gap-6 justify-center items-center'>
+            <img
+              src='https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg'
+              alt='empty content'
+              className='w-1/2 h-auto'
+            />
+            <Text color='gray' className='text-2xl'>
+              You haven't added any tasks
+            </Text>
+            <div className='flex justify-center'>
+              <div className='rounded-full text-brand border-brand border-dashed border'>
+                <Button
+                  size='3'
+                  variant='soft'
+                  onClick={() => dispatch(showTaskPanel(null))}
+                >
                   <AddCircleIcon />
                   Add Tasks
-                </Text>
-              </Link>
-            </div>
-          ) : (
-            <div className='flex flex-col gap-6 justify-center items-center'>
-              <img
-                src='https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg'
-                alt='empty content'
-                className='w-1/2 h-auto'
-              />
-              <Text color='gray' className='text-2xl'>
-                You haven't added any tasks
-              </Text>
-              <div className='flex justify-center'>
-                <div className='rounded-full text-brand border-brand border-dashed border'>
-                  <Button
-                    size='3'
-                    variant='soft'
-                    onClick={() => dispatch(showTaskPanel())}
-                  >
-                    <AddCircleIcon />
-                    Add Tasks
-                  </Button>
-                </div>
+                </Button>
               </div>
             </div>
-          )}
-        </Spinner>
+          </div>
+        )}
       </div>
     </div>
   );

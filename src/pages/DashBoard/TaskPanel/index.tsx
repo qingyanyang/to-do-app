@@ -17,11 +17,12 @@ import {
 } from '@radix-ui/themes';
 
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import {
   createTaskAsync,
   hideTaskPanel,
+  editTaskAsync,
 } from '../../../store/modules/taskSlice';
 import {
   validateDateTimeRange,
@@ -32,12 +33,22 @@ import MyBadge from '../../../components/MyBadge';
 export type SeverityLevel = 'Low' | 'Moderate' | 'Critical' | 'Urgent';
 
 export const labels = [
-  { name: 'study', color: 'indigo' },
-  { name: 'work', color: 'cyan' },
-  { name: 'health', color: 'orange' },
-  { name: 'dating', color: 'crimson' },
-  { name: 'entertainment', color: 'yellow' },
+  { name: 'study', color: 'indigo', index: 0 },
+  { name: 'work', color: 'cyan', index: 1 },
+  { name: 'health', color: 'orange', index: 2 },
+  { name: 'dating', color: 'crimson', index: 3 },
+  { name: 'entertainment', color: 'yellow', index: 4 },
 ];
+
+const mapLabelToIndex = (searchName: string): number => {
+  let resIndex = 0;
+  labels.forEach((label) => {
+    if (label.name === searchName) {
+      resIndex = label.index;
+    }
+  });
+  return resIndex;
+};
 export const severitys: Record<SeverityLevel, number> = {
   Low: 1,
   Moderate: 2,
@@ -61,6 +72,9 @@ const TaskPanel = () => {
   // Calculate the max date as 7 days from today
   const maxDate = today.add(7, 'day');
 
+  const dispatch = useAppDispatch();
+  const { loading, editTaskContent } = useAppSelector((state) => state.task);
+
   const [desc, setDesc] = useState('');
   const [counter, setCounter] = useState(0);
   const [startScheduleTime, setStartScheduleTime] = useState(today);
@@ -68,14 +82,11 @@ const TaskPanel = () => {
   const [startScheduleDate, setStartScheduleDate] = useState(today);
   const [endScheduleDate, setEndScheduleDate] = useState(today);
   const [selectedSeverityValue, setSelectedSeverityValue] = useState('Low');
-  const [selectedLabelValue, setSelectedLabelValue] = useState(0);
+  const [selectedLabelValue, setSelectedLabelValue] = useState<number>(0);
   const [descErrorMsg, setDescErrorMsg] = useState('');
   const [timeErrorMsg, setTimeErrorMsg] = useState('');
   const [dateErrorMsg, setDateErrorMsg] = useState('');
   const [timeExpired, setTimeExpired] = useState(false);
-
-  const dispatch = useAppDispatch();
-  const { loading } = useAppSelector((state) => state.task);
 
   const onSuccess = () => {
     setDesc('');
@@ -89,13 +100,13 @@ const TaskPanel = () => {
   };
 
   const handleCreateTask = () => {
-    console.log(desc);
-    console.log(startScheduleTime);
-    console.log(endScheduleTime);
-    console.log(startScheduleDate);
-    console.log(endScheduleDate);
-    console.log(selectedSeverityValue);
-    console.log(labels[selectedLabelValue].name);
+    // console.log(desc);
+    // console.log(startScheduleTime);
+    // console.log(endScheduleTime);
+    // console.log(startScheduleDate);
+    // console.log(endScheduleDate);
+    // console.log(selectedSeverityValue);
+    // console.log(labels[selectedLabelValue].name);
 
     const newDescErrorMsg = validateTaskDesc(desc);
     setDescErrorMsg(newDescErrorMsg);
@@ -111,18 +122,47 @@ const TaskPanel = () => {
         dispatch(
           createTaskAsync(
             {
+              taskId: '',
               desc: desc,
               label: labels[selectedLabelValue].name,
               severity: selectedSeverityValue,
-              scheduledStartTime: startScheduleTime,
-              scheduledEndTime: endScheduleTime,
-              scheduledStartDate: startScheduleDate,
-              scheduledEndDate: endScheduleDate,
+              scheduledStartTime: startScheduleTime.toDate(),
+              scheduledEndTime: endScheduleTime.toDate(),
+              scheduledStartDate: startScheduleDate.toDate(),
+              scheduledEndDate: endScheduleDate.toDate(),
             },
             onSuccess,
           ),
         );
       }
+    }
+  };
+
+  const handleEditTask = () => {
+    // console.log(desc);
+    // console.log(startScheduleTime);
+    // console.log(endScheduleTime);
+    // console.log(selectedSeverityValue);
+    // console.log(labels[selectedLabelValue].name);
+
+    const newDescErrorMsg = validateTaskDesc(desc);
+    setDescErrorMsg(newDescErrorMsg);
+
+    if (newDescErrorMsg === '' && timeErrorMsg === '') {
+      dispatch(
+        editTaskAsync(
+          editTaskContent!.taskId,
+          {
+            desc: desc,
+            label: labels[selectedLabelValue].name,
+            severity: selectedSeverityValue,
+            scheduledStartTime: startScheduleTime.toDate(),
+            scheduledEndTime: endScheduleTime.toDate(),
+          },
+          new Date(),
+          () => dispatch(hideTaskPanel()),
+        ),
+      );
     }
   };
 
@@ -199,6 +239,19 @@ const TaskPanel = () => {
     setSelectedLabelValue(index);
   };
 
+  useEffect(() => {
+    if (editTaskContent) {
+      setDesc(editTaskContent.desc);
+      setCounter(editTaskContent.desc.length);
+      setStartScheduleTime(dayjs(editTaskContent.scheduledStartTime));
+      setEndScheduleTime(dayjs(editTaskContent.scheduledEndTime));
+      setSelectedSeverityValue(editTaskContent.severity);
+      setSelectedLabelValue(mapLabelToIndex(editTaskContent.label));
+    } else {
+      onSuccess();
+    }
+  }, [editTaskContent]);
+
   return (
     <div className='w-screen h-full fixed top-0 desktop:relative'>
       <div className='desktop:hidden block w-full h-full backdrop-blur-sm absolute'></div>
@@ -229,7 +282,8 @@ const TaskPanel = () => {
                 </Box>
                 <div className='flex gap-4 justify-between'>
                   <Text color={counter >= 200 ? 'indigo' : 'gray'} size='2'>
-                    {counter}/200
+                    {counter}
+                    /200
                   </Text>
                   {descErrorMsg && (
                     <Text color='red' size='2'>
@@ -256,26 +310,28 @@ const TaskPanel = () => {
                   <Box height='16px'></Box>
                 )}
               </div>
-              <div className='flex flex-col gap-2'>
-                <Heading size='3'>Date Schedule *</Heading>
-                <SingleInputDateRangeField
-                  sx={{
-                    input: { color: '#7f838b', borderColor: 'white' },
-                  }}
-                  variant={'standard'}
-                  value={[startScheduleDate, endScheduleDate]}
-                  minDate={today}
-                  maxDate={maxDate}
-                  onChange={getDateRangeValue()}
-                />
-                {dateErrorMsg ? (
-                  <Text color='red' size='2'>
-                    {dateErrorMsg}
-                  </Text>
-                ) : (
-                  <Box height='16px'></Box>
-                )}
-              </div>
+              {!editTaskContent && (
+                <div className='flex flex-col gap-2'>
+                  <Heading size='3'>Date Schedule *</Heading>
+                  <SingleInputDateRangeField
+                    sx={{
+                      input: { color: '#7f838b', borderColor: 'white' },
+                    }}
+                    variant={'standard'}
+                    value={[startScheduleDate, endScheduleDate]}
+                    minDate={today}
+                    maxDate={maxDate}
+                    onChange={getDateRangeValue()}
+                  />
+                  {dateErrorMsg ? (
+                    <Text color='red' size='2'>
+                      {dateErrorMsg}
+                    </Text>
+                  ) : (
+                    <Box height='16px'></Box>
+                  )}
+                </div>
+              )}
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Severity *</Heading>
                 <RadioCards.Root
@@ -302,13 +358,13 @@ const TaskPanel = () => {
               <div className='flex flex-col gap-2'>
                 <Heading size='3'>Labels *</Heading>
                 <Flex wrap='wrap' gapX={'2'} gapY={'2'}>
-                  {labels.map((label, index) => (
+                  {labels.map((label) => (
                     <MyBadge
                       label={label.name}
-                      key={index}
-                      onClick={() => handleLabelClick(index)}
+                      key={label.index}
+                      onClick={() => handleLabelClick(label.index)}
                       variant={
-                        selectedLabelValue === index ? 'solid' : 'outline'
+                        selectedLabelValue === label.index ? 'solid' : 'outline'
                       }
                       size={'3'}
                     >
@@ -320,15 +376,27 @@ const TaskPanel = () => {
               <div>
                 <AlertDialog.Root>
                   <AlertDialog.Trigger>
-                    <Button
-                      variant='classic'
-                      size='2'
-                      onClick={handleCreateTask}
-                    >
-                      <Spinner loading={loading}>
-                        &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
-                      </Spinner>
-                    </Button>
+                    {editTaskContent ? (
+                      <Button
+                        variant='classic'
+                        size='2'
+                        onClick={handleEditTask}
+                      >
+                        <Spinner loading={loading.editTaskContentLoading}>
+                          &nbsp;&nbsp;&nbsp;Save Task&nbsp;&nbsp;&nbsp;
+                        </Spinner>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant='classic'
+                        size='2'
+                        onClick={handleCreateTask}
+                      >
+                        <Spinner loading={loading.createTaskLoading}>
+                          &nbsp;&nbsp;&nbsp;Create Task&nbsp;&nbsp;&nbsp;
+                        </Spinner>
+                      </Button>
+                    )}
                   </AlertDialog.Trigger>
                   {timeExpired && (
                     <AlertDialog.Content maxWidth='450px'>

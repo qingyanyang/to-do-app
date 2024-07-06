@@ -13,11 +13,7 @@ import {
   removeUID,
 } from '../../util/localStorageFucs';
 import MenuIcon from '@mui/icons-material/Menu';
-import {
-  CalendarIcon,
-  CountdownTimerIcon,
-  TokensIcon,
-} from '@radix-ui/react-icons';
+import { CountdownTimerIcon, LockClosedIcon } from '@radix-ui/react-icons';
 
 import { LocalizationProvider } from '@mui/x-date-pickers-pro';
 import TaskPanel from './TaskPanel';
@@ -31,15 +27,15 @@ const navMenu = [
     path: '/',
   },
   {
-    icon: <CalendarIcon />,
-    label: 'Calender',
+    icon: <LockClosedIcon />,
+    label: '...',
     path: 'calender',
   },
-  {
-    icon: <TokensIcon />,
-    label: 'Settings',
-    path: 'settings',
-  },
+  // {
+  //   icon: <TokensIcon />,
+  //   label: 'Settings',
+  //   path: 'settings',
+  // },
 ];
 
 function DashBoard() {
@@ -89,30 +85,21 @@ function DashBoard() {
             className={`${!showNavBar && '-translate-y-[100vh]'} ease-in-out absolute top-[10vh] w-full py-10 px-6 bg-[#111113] backdrop-blur-lg rounded-b-lg`}
           >
             <div className='flex flex-col gap-8'>
-              <button onClick={handleShowNavBar}>
-                <RouterLink to={'/'}>
-                  <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
-                    <CalendarIcon />
-                    Today's
-                  </div>
-                </RouterLink>
-              </button>
-              <button onClick={handleShowNavBar}>
-                <RouterLink to={'calender'}>
-                  <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
-                    <CountdownTimerIcon />
-                    Calender
-                  </div>
-                </RouterLink>
-              </button>
-              <button onClick={handleShowNavBar}>
-                <RouterLink to={'settings'}>
-                  <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
-                    <TokensIcon />
-                    Settings
-                  </div>
-                </RouterLink>
-              </button>
+              {navMenu.map((menuItem, index) => (
+                <button onClick={handleShowNavBar}>
+                  <RouterLink
+                    key={menuItem.path}
+                    to={menuItem.path}
+                    onClick={() => handleNavMenuSwitch(index)}
+                  >
+                    <div className='flex justify-start gap-6 items-center text-disabled hover:text-primary-invert'>
+                      {menuItem.icon}
+                      {menuItem.label}
+                    </div>
+                  </RouterLink>
+                </button>
+              ))}
+
               <Button variant='surface' size='3' onClick={handleLogout}>
                 &nbsp;&nbsp;&nbsp;Log out &nbsp;&nbsp;&nbsp;
               </Button>
@@ -127,7 +114,9 @@ function DashBoard() {
                 size='3'
                 radius='full'
                 src={getProfileURL() ?? undefined}
-                fallback='A'
+                fallback={
+                  getUserEmail() ? getUserEmail()![0].toUpperCase() : 'A'
+                }
               />
               <Text className='text-l short-label-ellipsis'>
                 {getUserEmail()}
@@ -143,7 +132,9 @@ function DashBoard() {
                 size='6'
                 radius='full'
                 src={getProfileURL() ?? undefined}
-                fallback='A'
+                fallback={
+                  getUserEmail() ? getUserEmail()![0].toUpperCase() : 'A'
+                }
               />
               <Text className='font-semibold text-2xl short-text-ellipsis'>
                 {getUserEmail()}
@@ -155,7 +146,7 @@ function DashBoard() {
             <div className='border-l-[0.5px] flex flex-col border-neutral'>
               {navMenu.map((menuItem, index) => (
                 <div
-                  key={index}
+                  key={menuItem.path}
                   className={`${navMenuIndex === index && ' border-x-brand'} border-l-2 border-transparent px-4 py-4`}
                 >
                   <RouterLink
@@ -173,14 +164,19 @@ function DashBoard() {
               ))}
             </div>
             <div className='flex flex-col mb-28'>
-              <Button size={'3'} onClick={() => dispatch(showTaskPanel())}>
+              <Button
+                size={'3'}
+                onClick={() => {
+                  dispatch(showTaskPanel(null));
+                }}
+              >
                 Quick Add <AddIcon />
               </Button>
             </div>
           </div>
         </div>
         <Flex className='gap-5 h-full tablet:ml-[250px] p-4 relative top-[80px] tablet:top-0'>
-          <div className='flex-1 mt-4 h-full tablet:mt-9'>
+          <div className='flex-1 mt-4 h-full w-full tablet:mt-9'>
             <Outlet />
           </div>
           {taskPanelVisible && (

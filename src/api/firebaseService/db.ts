@@ -1,3 +1,4 @@
+import { FirebaseStampTask } from '../../store/modules/taskSlice';
 import { db } from '../../FirebaseConfig';
 
 import {
@@ -50,10 +51,32 @@ const getDocumentsFromLastCollection = async (fromCollection: string) => {
   if (docsSnapshot.empty) {
     return null;
   }
-  const docsData = docsSnapshot.docs.map((docSnapshot) => docSnapshot.data());
+  const docsData = docsSnapshot.docs.map((docSnapshot) => {
+    return {
+      ...(docSnapshot.data() as Omit<FirebaseStampTask, 'id'>),
+      id: docSnapshot.id,
+    };
+  });
   return docsData;
 };
 
+// edit field of document
+const editDocumentField = async (
+  fromCollection: string,
+  documentName: string,
+  document: object,
+) => {
+  await setDoc(doc(db, fromCollection, documentName), document, {
+    merge: true,
+  });
+};
+// delete task
+const deleteDocumentByDocumentName = async (
+  fromCollection: string,
+  documentName: string,
+) => {
+  return await deleteDoc(doc(db, fromCollection, documentName));
+};
 /**
  * 
  * 
@@ -63,7 +86,7 @@ month:"07",
   {day:"18",dailyTasks:[{...},{...},{...}]},
   ]
 }
- * @returns 
+ *
  */
 const getDocumentsFromCollection = async (path: string) => {
   const monthData = {
@@ -110,18 +133,12 @@ const getDocumentsByKeyWord = async (
     query(collectionRef, startAt(docStartSnap), endAt(docEndSnap)),
   );
 };
-// delete task
-const deleteDocumentByDocumentName = async (
-  fromCollection: string,
-  documentName: string,
-) => {
-  return await deleteDoc(doc(db, fromCollection, documentName));
-};
 
 export const FirebaseFirestoreService = {
   createDocument,
   createDocumentWithName,
   getDocumentsFromLastCollection,
+  editDocumentField,
   getDocumentsFromCollection,
   getDocumentsByKeyWord,
   getDocumentByDocumentName,

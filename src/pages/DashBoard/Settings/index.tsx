@@ -12,10 +12,12 @@ import {
   IconButton,
 } from '@radix-ui/themes';
 import React from 'react';
+import ConstructionMask from '../../../components/ConstructionMask';
 
 function Settings() {
   return (
-    <div>
+    <div className='relative z-0 pointer-events-none'>
+      <ConstructionMask />
       <Flex direction='column' gap='5'>
         <Card variant='surface'>
           <Tabs.Root defaultValue='account'>

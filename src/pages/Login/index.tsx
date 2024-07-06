@@ -129,11 +129,7 @@ function Login() {
         setUID(res.user.uid);
         setToken(accessToken);
         setUserEmail(res.user.email ? res.user.email : 'example@email.com');
-        setProfileURL(
-          res.user.photoURL
-            ? res.user.photoURL
-            : 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop',
-        );
+        setProfileURL(res.user.photoURL);
         // redirect
         navigate('/');
       } catch (error) {
@@ -150,11 +146,7 @@ function Login() {
       setUID(res.user.uid);
       setToken(accessToken);
       setUserEmail(res.user.email ? res.user.email : 'user');
-      setProfileURL(
-        res.user.photoURL
-          ? res.user.photoURL
-          : 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop',
-      );
+      setProfileURL(res.user.photoURL);
       // redirect
       navigate('/');
     } catch (error) {
@@ -275,9 +267,7 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
         const res = await FirebaseAuthService.registerUser(email, password);
         const userEmail = res.user.email;
         const uid = res.user.uid;
-        const photoURL = res.user.photoURL
-          ? res.user.photoURL
-          : 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?&w=256&h=256&q=70&crop=focalpoint&fp-x=0.5&fp-y=0.3&fp-z=1&fit=crop';
+        const photoURL = res.user.photoURL;
 
         // create user document
         await FirebaseFirestoreService.createDocumentWithName(

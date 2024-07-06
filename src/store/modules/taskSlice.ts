@@ -5,33 +5,47 @@ import {
   UnknownAction,
 } from '@reduxjs/toolkit';
 import type { RootState } from '..';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { FirebaseFirestoreService } from '../../api/firebaseService/db';
 import { getUID } from '../../util/localStorageFucs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import { Timestamp } from 'firebase/firestore';
 
-interface Task {
+// interface Task {
+//   desc: string;
+//   label: string;
+//   severity: string;
+//   scheduledStartTime: Dayjs;
+//   scheduledEndTime: Dayjs;
+//   scheduledStartDate?: Dayjs;
+//   scheduledEndDate?: Dayjs;
+//   isCompleted?: boolean;
+//   isExpired?: boolean;
+// }
+
+// create
+export interface Task {
+  taskId: string;
   desc: string;
   label: string;
   severity: string;
-  scheduledStartTime: Dayjs;
-  scheduledEndTime: Dayjs;
-  scheduledStartDate?: Dayjs;
-  scheduledEndDate?: Dayjs;
+  scheduledStartTime: Date;
+  scheduledEndTime: Date;
+  scheduledStartDate?: Date;
+  scheduledEndDate?: Date;
   isCompleted?: boolean;
   isExpired?: boolean;
 }
 
-interface StampTask {
+export interface FirebaseStampTask {
+  taskId: string;
   desc: string;
   label: string;
   severity: string;
-  scheduledStartTime: number;
-  scheduledEndTime: number;
-  scheduledStartDate?: number;
-  scheduledEndDate?: number;
-  isCompleted?: boolean;
-  isExpired?: boolean;
+  scheduledStartTime: Timestamp;
+  scheduledEndTime: Timestamp;
+  isCompleted: boolean;
+  isExpired: boolean;
 }
 
 export type SearchMethod = {
@@ -44,20 +58,25 @@ export type SearchMethod = {
   sortMethod: { way: string; atz: boolean }; // default value: 'scheduledTime true'
 };
 
+export type LoadingKey =
+  | 'getTaskLoading'
+  | 'createTaskLoading'
+  | 'editTaskLoading'
+  | 'deleteTaskLoading'
+  | 'editTaskContentLoading';
 interface TaskState {
   taskPanelVisible: boolean;
-  todayTasks: StampTask[];
-  todaySearchResultTasks: StampTask[];
+  todayTasks: Task[];
+  todaySearchResultTasks: Task[];
   todayTasksComplete: { total: number; completedNum: number }; // query this by month and year
-  editTaskContent: {
-    desc: string;
-    label: string;
-    severity: string;
-    scheduledStartTime: number;
-    scheduledEndTime: number;
-    isCompleted: boolean;
-  } | null;
-  loading: boolean;
+  editTaskContent: Task | null;
+  loading: {
+    getTaskLoading: boolean;
+    createTaskLoading: boolean;
+    editTaskLoading: boolean;
+    deleteTaskLoading: boolean;
+    editTaskContentLoading: boolean;
+  };
   error: string | null;
   success: string | null;
 }
@@ -68,31 +87,56 @@ const initialState: TaskState = {
   todaySearchResultTasks: [],
   todayTasksComplete: { total: 0, completedNum: 0 },
   editTaskContent: null,
-  loading: false,
+  loading: {
+    getTaskLoading: false,
+    createTaskLoading: false,
+    editTaskLoading: false,
+    deleteTaskLoading: false,
+    editTaskContentLoading: false,
+  },
   error: null,
   success: null,
 };
 
 // need unit test
-const getTimeDifferenceInMinutes = (start: number, end: number): number => {
-  const millisecondsDifference = end - start;
-  // Convert milliseconds to minutes
-  return Math.floor(millisecondsDifference / (1000 * 60));
+const getTimeDifferenceInMinutes = (start: Date, end: Date): number => {
+  return (end.getTime() - start.getTime()) / (1000 * 60); // Convert milliseconds to minutes
 };
 
 export const taskSlice = createSlice({
   name: 'task',
   initialState,
   reducers: {
-    showTaskPanel: (state) => {
+    showTaskPanel: (state, action: PayloadAction<Task | null>) => {
       state.taskPanelVisible = true;
+      const taskNeededEdit = action.payload;
+      if (taskNeededEdit) {
+        state.editTaskContent = {
+          taskId: taskNeededEdit.taskId,
+          desc: taskNeededEdit.desc,
+          label: taskNeededEdit.label,
+          severity: taskNeededEdit.severity,
+          scheduledStartTime: taskNeededEdit.scheduledStartTime,
+          scheduledEndTime: taskNeededEdit.scheduledEndTime,
+        };
+      } else {
+        state.editTaskContent = null;
+      }
+    },
+    resetTaskPanelContent: (state) => {
+      state.editTaskContent = null;
     },
     hideTaskPanel: (state) => {
       state.taskPanelVisible = false;
+      // clear state
+      state.editTaskContent = null;
     },
     // get today's tasks list
-    updateTodayTasks: (state, action: PayloadAction<StampTask[]>) => {
+    updateTodayTasks: (state, action: PayloadAction<Task[]>) => {
       state.todayTasks = action.payload;
+    },
+    updatedTodaySearchResultTasks: (state, action: PayloadAction<Task[]>) => {
+      state.todaySearchResultTasks = action.payload;
     },
     // get today's searched tasks by [ searched name, severity, label, sortMethod]
     getTodaySearchResultTasks: (state, action: PayloadAction<SearchMethod>) => {
@@ -139,7 +183,8 @@ export const taskSlice = createSlice({
           let comparison = 0;
           switch (way) {
             case 'scheduledStartTime':
-              comparison = a.scheduledStartTime - b.scheduledStartTime;
+              comparison =
+                a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime();
               break;
             case 'totalTimeUse':
               const timeUseA = getTimeDifferenceInMinutes(
@@ -178,60 +223,13 @@ export const taskSlice = createSlice({
     // getMonthTasks: (state, action: PayloadAction<MonthTask[]>) => {
     //   state.monthTasks = action.payload;
     // },
-    // get task content
-    // getEditTaskContentByTodayList: (state, action: PayloadAction<string>) => {
-    //   const taskId = action.payload;
-    //   const taskNeededEdit = state.todayTasks.find(
-    //     (task) => task.taskId === taskId,
-    //   );
-    //   if (taskNeededEdit) {
-    //     state.editTaskContent = {
-    //       desc: taskNeededEdit.desc,
-    //       label: taskNeededEdit.label,
-    //       severity: taskNeededEdit.severity,
-    //       scheduledStartTime: taskNeededEdit.scheduledStartTime,
-    //       scheduledEndTime: taskNeededEdit.scheduledEndTime,
-    //       scheduledStartDate: taskNeededEdit.scheduledStartDate,
-    //       scheduledEndDate: taskNeededEdit.scheduledEndDate,
-    //       isCompleted: taskNeededEdit.isCompleted,
-    //     };
-    //   } else {
-    //     throw new Error('Please check the task ID passed');
-    //   }
-    // },
-    // getEditTaskContentByMonthTasksList: (
-    //   state,
-    //   action: PayloadAction<{ taskId: string; date: number }>,
-    // ) => {
-    //   const { taskId, date } = action.payload;
-    //   const tasksNeededEdit = state.monthTasks.find(
-    //     (dateTask) => dateTask.date === date,
-    //   );
-
-    //   let taskNeededEdit = null;
-    //   if (tasksNeededEdit) {
-    //     taskNeededEdit = tasksNeededEdit.tasks.find(
-    //       (task) => task.taskId === taskId,
-    //     );
-    //   }
-
-    //   if (taskNeededEdit) {
-    //     state.editTaskContent = {
-    //       desc: taskNeededEdit.desc,
-    //       label: taskNeededEdit.label,
-    //       severity: taskNeededEdit.severity,
-    //       scheduledStartTime: taskNeededEdit.scheduledStartTime,
-    //       scheduledEndTime: taskNeededEdit.scheduledEndTime,
-    //       scheduledStartDate: taskNeededEdit.scheduledStartDate,
-    //       scheduledEndDate: taskNeededEdit.scheduledEndDate,
-    //       isCompleted: taskNeededEdit.isCompleted,
-    //     };
-    //   } else {
-    //     throw new Error('Please check the task ID and date passed');
-    //   }
-    // },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
+    // loading
+    setLoading: (
+      state,
+      action: PayloadAction<{ attribute: LoadingKey; value: boolean }>,
+    ) => {
+      const { attribute, value } = action.payload;
+      state.loading[attribute] = value;
     },
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
@@ -245,7 +243,13 @@ export const taskSlice = createSlice({
       state.todaySearchResultTasks = [];
       state.todayTasksComplete = { total: 0, completedNum: 0 };
       state.editTaskContent = null;
-      state.loading = false;
+      state.loading = {
+        getTaskLoading: false,
+        createTaskLoading: false,
+        editTaskLoading: false,
+        deleteTaskLoading: false,
+        editTaskContentLoading: false,
+      };
       state.error = null;
       state.success = null;
     },
@@ -256,12 +260,14 @@ export const {
   showTaskPanel,
   hideTaskPanel,
   updateTodayTasks,
+  updatedTodaySearchResultTasks,
   getTodaySearchResultTasks,
   getTodayTasksComplete,
   setLoading,
   setError,
   setSuccess,
   setRevertState,
+  resetTaskPanelContent,
 } = taskSlice.actions;
 
 export const createTaskAsync =
@@ -270,20 +276,23 @@ export const createTaskAsync =
     onSuccess?: () => void,
   ): ThunkAction<void, RootState, unknown, UnknownAction> =>
   async (dispatch) => {
-    const { scheduledStartDate, scheduledEndDate } = document; //Dayjs type
+    // Dispatch loading state
+    dispatch(setLoading({ attribute: 'createTaskLoading', value: true }));
+    dispatch(setError(null));
+    dispatch(setSuccess(null));
+
+    const { scheduledStartDate, scheduledEndDate } = document; // Date type
     //  get uid
     const uid = getUID();
     // Convert scheduled start and end dates to JavaScript Date objects
-    const startDate = scheduledStartDate
-      ? scheduledStartDate.toDate()
-      : new Date();
-    const endDate = scheduledEndDate ? scheduledEndDate.toDate() : new Date();
+    const startDate = scheduledStartDate ? scheduledStartDate : new Date();
+    const endDate = scheduledEndDate ? scheduledEndDate : new Date();
 
     // check if today is in the range, if it is, need to update today's data or monthly data
     dayjs.extend(isSameOrAfter);
     const isTodayInDuration =
-      dayjs().isSameOrAfter(scheduledStartDate, 'date') &&
-      scheduledEndDate?.isSameOrAfter(dayjs(), 'date');
+      dayjs().isSameOrAfter(dayjs(scheduledStartDate), 'date') &&
+      dayjs(scheduledEndDate)?.isSameOrAfter(dayjs(), 'date');
 
     // Initialize an array to store tasks to be created
     const tasksToCreate = [];
@@ -310,8 +319,8 @@ export const createTaskAsync =
         severity: document.severity,
         isCompleted: false,
         isExpired: false,
-        scheduledStartTime: document.scheduledStartTime.toDate(),
-        scheduledEndTime: document.scheduledEndTime.toDate(),
+        scheduledStartTime: document.scheduledStartTime,
+        scheduledEndTime: document.scheduledEndTime,
       };
 
       // Add the task to the array of tasks to be created
@@ -320,11 +329,6 @@ export const createTaskAsync =
         taskWithTimestamps,
       });
     }
-
-    // Dispatch loading state
-    dispatch(setLoading(true));
-    dispatch(setError(null));
-    dispatch(setSuccess(null));
 
     try {
       // Iterate through the tasks to be created and add them to Firestore
@@ -335,18 +339,19 @@ export const createTaskAsync =
         );
       }
       // Dispatch success state
-      dispatch(setLoading(false));
+      dispatch(setLoading({ attribute: 'createTaskLoading', value: false }));
       dispatch(setSuccess('Task created successfully!'));
       if (onSuccess) onSuccess();
       // Additional actions like updating tasks
-      console.log('isTodayInDuration' + isTodayInDuration);
+
       if (isTodayInDuration) {
         dispatch(getTodayTasksAsync());
+        dispatch(getTodayTasksComplete());
       }
       // Example: await dispatch(getMonthTasksAsync());
     } catch (error) {
       // Dispatch error state
-      dispatch(setLoading(false));
+      dispatch(setLoading({ attribute: 'createTaskLoading', value: false }));
       dispatch(
         setError(error instanceof Error ? error.message : 'Unknown error'),
       );
@@ -359,8 +364,9 @@ export const getTodayTasksAsync =
     onSuccess?: () => void,
   ): ThunkAction<void, RootState, unknown, UnknownAction> =>
   async (dispatch) => {
-    dispatch(setLoading(true));
+    dispatch(setLoading({ attribute: 'getTaskLoading', value: true }));
     dispatch(setError(null));
+
     try {
       const uid = getUID();
       const now = new Date();
@@ -373,30 +379,26 @@ export const getTodayTasksAsync =
         await FirebaseFirestoreService.getDocumentsFromLastCollection(path);
 
       console.log(dailyTasksForToday);
-      dispatch(setLoading(false));
+      dispatch(setLoading({ attribute: 'getTaskLoading', value: false }));
       // when editing a task, can only edit des,label,servirty,starttime and endtime
       if (dailyTasksForToday) {
         const tasks = dailyTasksForToday.map((dailyTask) => ({
+          taskId: dailyTask.id,
           desc: dailyTask.desc,
           label: dailyTask.label,
           severity: dailyTask.severity,
-          scheduledStartTime:
-            dailyTask.scheduledStartTime.seconds * 1000 +
-            dailyTask.scheduledStartTime.nanoseconds / 1000000,
-          scheduledEndTime:
-            dailyTask.scheduledEndTime.seconds * 1000 +
-            dailyTask.scheduledEndTime.nanoseconds / 1000000,
+          scheduledStartTime: dailyTask.scheduledStartTime.toDate(),
+          scheduledEndTime: dailyTask.scheduledEndTime.toDate(),
           isCompleted: dailyTask.isCompleted,
           isExpired: dailyTask.isExpired,
         }));
 
         dispatch(updateTodayTasks(tasks));
-
         dispatch(getTodayTasksComplete());
         if (onSuccess) onSuccess();
       }
     } catch (error) {
-      dispatch(setLoading(false));
+      dispatch(setLoading({ attribute: 'getTaskLoading', value: false }));
       dispatch(
         setError(error instanceof Error ? error.message : 'Unknown error'),
       );
@@ -404,13 +406,178 @@ export const getTodayTasksAsync =
     }
   };
 
-// export const updateTaskByTaskIdAsync =
-//   (taskId: string): ThunkAction<void, RootState, unknown, UnknownAction> =>
-//   async (dispatch) => {
-//     const asyncResp = await Promise.resolve('hello world');
-//     // if(asyncResp)
-//     // dispatch(updateTodayTasks(asyncResp));
-//     // dispatch()
-//   };
+export const editTaskAsync =
+  (
+    documentName: string,
+    document: object,
+    date: Date,
+    onSuccess?: () => void,
+  ): ThunkAction<void, RootState, unknown, UnknownAction> =>
+  async (dispatch, getState) => {
+    dispatch(
+      setLoading({
+        attribute:
+          'isCompleted' in document
+            ? 'editTaskLoading'
+            : 'editTaskContentLoading',
+        value: true,
+      }),
+    );
+    dispatch(setError(null));
+    dispatch(setSuccess(null));
+    try {
+      const uid = getUID();
+      const year = date.getFullYear().toString();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const documentPath = `users/${uid}/tasks/${year}/${month}/${day}/dailyTasks`;
+
+      await FirebaseFirestoreService.editDocumentField(
+        documentPath,
+        documentName,
+        document,
+      );
+
+      // change state of today'list
+      const { todayTasks, todaySearchResultTasks } = getState().task;
+      if (todayTasks.length > 0) {
+        let found = false;
+        const updatedTodayTasks = todayTasks.map((task) => {
+          if (task.taskId === documentName) {
+            found = true;
+            return {
+              ...task,
+              ...document,
+            };
+          } else {
+            return task;
+          }
+        });
+        if (found) dispatch(updateTodayTasks(updatedTodayTasks));
+      }
+      // change state of search'list
+      if (todaySearchResultTasks.length > 0) {
+        let found = false;
+        const updatedSearchResultTasks = todaySearchResultTasks.map((task) => {
+          if (task.taskId === documentName) {
+            found = true;
+            return {
+              ...task,
+              ...document,
+            };
+          } else {
+            return task;
+          }
+        });
+        if (found)
+          dispatch(updatedTodaySearchResultTasks(updatedSearchResultTasks));
+      }
+
+      dispatch(getTodayTasksComplete());
+
+      // change state of month'list
+
+      dispatch(
+        setLoading({
+          attribute:
+            'isCompleted' in document
+              ? 'editTaskLoading'
+              : 'editTaskContentLoading',
+          value: false,
+        }),
+      );
+      dispatch(setSuccess('Task edit successfully!'));
+
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      dispatch(
+        setLoading({
+          attribute:
+            'isCompleted' in document
+              ? 'editTaskLoading'
+              : 'editTaskContentLoading',
+          value: false,
+        }),
+      );
+      dispatch(
+        setError(error instanceof Error ? error.message : 'Unknown error'),
+      );
+      dispatch(setSuccess(null));
+    }
+  };
+
+export const daleteTaskByTaskIdAsync =
+  (
+    documentName: string,
+    date: Date,
+    onSuccess?: () => void,
+  ): ThunkAction<void, RootState, unknown, UnknownAction> =>
+  async (dispatch, getState) => {
+    dispatch(
+      setLoading({
+        attribute: 'deleteTaskLoading',
+        value: true,
+      }),
+    );
+    dispatch(setError(null));
+    dispatch(setSuccess(null));
+    try {
+      const uid = getUID();
+      const year = date.getFullYear().toString();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      const documentPath = `users/${uid}/tasks/${year}/${month}/${day}/dailyTasks`;
+
+      await FirebaseFirestoreService.deleteDocumentByDocumentName(
+        documentPath,
+        documentName,
+      );
+
+      // change state of today'list
+      const { todayTasks, todaySearchResultTasks, editTaskContent } =
+        getState().task;
+      // delete content
+      if (editTaskContent && editTaskContent.taskId === documentName) {
+        dispatch(resetTaskPanelContent());
+      }
+      if (todayTasks.length > 0) {
+        const updatedTodayTasks = todayTasks.filter(
+          (task) => task.taskId != documentName,
+        );
+        dispatch(updateTodayTasks(updatedTodayTasks));
+      }
+      // change state of search'list
+      if (todaySearchResultTasks.length > 0) {
+        const updatedSearchResultTasks = todaySearchResultTasks.filter(
+          (task) => task.taskId != documentName,
+        );
+        dispatch(updatedTodaySearchResultTasks(updatedSearchResultTasks));
+      }
+
+      dispatch(getTodayTasksComplete());
+      // change state of month'list
+
+      dispatch(
+        setLoading({
+          attribute: 'deleteTaskLoading',
+          value: false,
+        }),
+      );
+      dispatch(setSuccess('Task delete successfully!'));
+
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      dispatch(
+        setLoading({
+          attribute: 'deleteTaskLoading',
+          value: false,
+        }),
+      );
+      dispatch(
+        setError(error instanceof Error ? error.message : 'Unknown error'),
+      );
+      dispatch(setSuccess(null));
+    }
+  };
 
 export default taskSlice.reducer;

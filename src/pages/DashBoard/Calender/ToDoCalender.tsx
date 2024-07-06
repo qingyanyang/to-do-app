@@ -68,7 +68,7 @@ const ToDoCalender: React.FC = () => {
     const handleTaskCardClick = () => {
       hide();
       // show panel
-      dispatch(showTaskPanel());
+      dispatch(showTaskPanel(null));
     };
     const listData = getListData(value);
     const content = (
