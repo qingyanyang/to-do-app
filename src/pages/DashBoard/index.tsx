@@ -74,7 +74,7 @@ function DashBoard() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className='h-full w-screen relative'>
+      <div className=' h-0 w-fullrelative'>
         {/* top nav bar */}
         {showNavBar && (
           <div className='backdrop-blur-lg w-full h-full fixed z-10'></div>
