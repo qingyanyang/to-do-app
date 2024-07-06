@@ -29,6 +29,8 @@ import {
 
 import { useAppDispatch } from '../../store/hooks';
 import { setError, setSuccess } from '../../store/modules/taskSlice';
+import { FirebaseError } from 'firebase/app';
+import { errorMSGMapping } from '../../util/constants';
 
 interface TodoInputProps {
   label: string;
@@ -140,8 +142,10 @@ function Login() {
         // redirect
         navigate('/');
         dispatch(setSuccess('Login successfully!'));
-      } catch (error) {
-        dispatch(setError(error as string));
+      } catch (error: unknown) {
+        if (error instanceof FirebaseError) {
+          dispatch(setError(errorMSGMapping(error.code)));
+        }
       }
     }
   };
@@ -160,8 +164,10 @@ function Login() {
       // redirect
       navigate('/');
       dispatch(setSuccess('Login successfully!'));
-    } catch (error) {
-      dispatch(setError(error as string));
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        dispatch(setError(errorMSGMapping(error.code)));
+      }
     }
   };
 
@@ -297,8 +303,10 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
         setPassword('');
         setConfirmPassword('');
         handleSwitch(0);
-      } catch (error) {
-        dispatch(setError(error as string));
+      } catch (error: unknown) {
+        if (error instanceof FirebaseError) {
+          dispatch(setError(errorMSGMapping(error.code)));
+        }
       }
     }
   };
@@ -407,8 +415,10 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ handleSwitch }) => {
         dispatch(setSuccess(null));
         await FirebaseAuthService.sendResetEmail(email);
         dispatch(setSuccess('Sent the password reset email!'));
-      } catch (error) {
-        dispatch(setError(error as string));
+      } catch (error: unknown) {
+        if (error instanceof FirebaseError) {
+          dispatch(setError(errorMSGMapping(error.code)));
+        }
       }
     }
   };

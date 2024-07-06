@@ -15,7 +15,6 @@ import {
   ScrollArea,
   IconButton,
   Spinner,
-  Skeleton,
 } from '@radix-ui/themes';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
@@ -185,6 +184,21 @@ function TodayTasks() {
     };
   };
 
+  const onEditSuccess = () => {
+    if (isSearch) {
+      const formatedSearchContent = getSearchedFormat(
+        searchContent,
+        selectedLevel,
+        selectedLabel,
+        selectedCompletence,
+        selectedSortWay,
+      );
+      dispatch(
+        getTodaySearchResultTasks(formatedSearchContent as SearchMethod),
+      );
+    }
+  };
+
   const handleTaskCardClick = (taskId: string, isCompleted: boolean) => {
     return () => {
       const isTaskCompeleted = !isCompleted;
@@ -214,6 +228,11 @@ function TodayTasks() {
       dispatch(getTodayTasksAsync());
     }
   }, []);
+
+  useEffect(() => {
+    // reload
+    onEditSuccess();
+  }, [todayTasks]);
 
   return (
     <div className='flex flex-col justify-start gap-9'>
@@ -251,228 +270,221 @@ function TodayTasks() {
       </Callout.Root>
       <div className='flex flex-col gap-8 h-full'>
         <div className='flex flex-col gap-4'>
-          <Text className='text-xl font-semibold'>
-            <Skeleton loading={loading.getTaskLoading}>Today's Tasks</Skeleton>
-          </Text>
+          <Text className='text-xl font-semibold'>Today's Tasks</Text>
           <div className='flex flex-col justify-between gap-3 items-start tablet:flex-row tablet:items-center'>
-            <Skeleton loading={loading.getTaskLoading}>
-              <div className='flex-1 w-full'>
-                <TextField.Root
-                  placeholder='Search task'
-                  radius='large'
-                  value={searchContent}
-                  onChange={handleSearchContentChange()}
-                >
-                  <TextField.Slot>
-                    <MagnifyingGlassIcon height='16' width='16' />
-                  </TextField.Slot>
-                </TextField.Root>
-              </div>
-              <div className='flex items-center gap-3'>
-                <Select.Root
-                  value={selectedLevel ? selectedLevel : ''}
-                  onValueChange={handleLevelChange()}
-                >
-                  <Select.Trigger placeholder='severity' />
-                  <Select.Content position='popper'>
-                    <Select.Item value='all'>all</Select.Item>
-                    <Select.Item value='Low'>low</Select.Item>
-                    <Select.Item value='Moderate'>moderate</Select.Item>
-                    <Select.Item value='Critical'>critical</Select.Item>
-                    <Select.Item value='Urgent'>urgent</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-                <Select.Root
-                  value={selectedLabel ? selectedLabel : ''}
-                  onValueChange={handleLabelChange()}
-                >
-                  <Select.Trigger placeholder='label' />
-                  <Select.Content position='popper'>
-                    <Select.Item value='all'>all</Select.Item>
-                    <Select.Item value='study'>study</Select.Item>
-                    <Select.Item value='work'>work</Select.Item>
-                    <Select.Item value='health'>health</Select.Item>
-                    <Select.Item value='dating'>dating</Select.Item>
-                    <Select.Item value='entertainment'>
-                      entertainment
-                    </Select.Item>
-                  </Select.Content>
-                </Select.Root>
-                <Select.Root
-                  value={selectedCompletence ? selectedCompletence : ''}
-                  onValueChange={handleCompletenceChange()}
-                >
-                  <Select.Trigger placeholder='completence' />
-                  <Select.Content position='popper'>
-                    <Select.Item value='all'>all</Select.Item>
-                    <Select.Item value='true'>done</Select.Item>
-                    <Select.Item value='false'>unfinish</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-                <Select.Root
-                  value={selectedSortWay ? selectedSortWay : ''}
-                  onValueChange={handleSelectedSortWayChange()}
-                >
-                  <Select.Trigger placeholder='sort way' />
-                  <Select.Content position='popper'>
-                    <Select.Item value='scheduledStartTime&&true'>
-                      start time ascending
-                    </Select.Item>
-                    <Select.Item value='scheduledStartTime&&false'>
-                      start time descending
-                    </Select.Item>
-                    <Select.Item value='totalTimeUse&&true'>
-                      time range ascending
-                    </Select.Item>
-                    <Select.Item value='totalTimeUse&&false'>
-                      time range descending
-                    </Select.Item>
-                  </Select.Content>
-                </Select.Root>
-              </div>
-            </Skeleton>
+            <div className='flex-1 w-full'>
+              <TextField.Root
+                placeholder='Search task'
+                radius='large'
+                value={searchContent}
+                onChange={handleSearchContentChange()}
+              >
+                <TextField.Slot>
+                  <MagnifyingGlassIcon height='16' width='16' />
+                </TextField.Slot>
+              </TextField.Root>
+            </div>
+            <div className='flex items-center gap-3'>
+              <Select.Root
+                value={selectedLevel ? selectedLevel : ''}
+                onValueChange={handleLevelChange()}
+              >
+                <Select.Trigger placeholder='severity' />
+                <Select.Content position='popper'>
+                  <Select.Item value='all'>all</Select.Item>
+                  <Select.Item value='Low'>low</Select.Item>
+                  <Select.Item value='Moderate'>moderate</Select.Item>
+                  <Select.Item value='Critical'>critical</Select.Item>
+                  <Select.Item value='Urgent'>urgent</Select.Item>
+                </Select.Content>
+              </Select.Root>
+              <Select.Root
+                value={selectedLabel ? selectedLabel : ''}
+                onValueChange={handleLabelChange()}
+              >
+                <Select.Trigger placeholder='label' />
+                <Select.Content position='popper'>
+                  <Select.Item value='all'>all</Select.Item>
+                  <Select.Item value='study'>study</Select.Item>
+                  <Select.Item value='work'>work</Select.Item>
+                  <Select.Item value='health'>health</Select.Item>
+                  <Select.Item value='dating'>dating</Select.Item>
+                  <Select.Item value='entertainment'>entertainment</Select.Item>
+                </Select.Content>
+              </Select.Root>
+              <Select.Root
+                value={selectedCompletence ? selectedCompletence : ''}
+                onValueChange={handleCompletenceChange()}
+              >
+                <Select.Trigger placeholder='completence' />
+                <Select.Content position='popper'>
+                  <Select.Item value='all'>all</Select.Item>
+                  <Select.Item value='true'>done</Select.Item>
+                  <Select.Item value='false'>unfinish</Select.Item>
+                </Select.Content>
+              </Select.Root>
+              <Select.Root
+                value={selectedSortWay ? selectedSortWay : ''}
+                onValueChange={handleSelectedSortWayChange()}
+              >
+                <Select.Trigger placeholder='sort way' />
+                <Select.Content position='popper'>
+                  <Select.Item value='scheduledStartTime&&true'>
+                    start time ascending
+                  </Select.Item>
+                  <Select.Item value='scheduledStartTime&&false'>
+                    start time descending
+                  </Select.Item>
+                  <Select.Item value='totalTimeUse&&true'>
+                    time range ascending
+                  </Select.Item>
+                  <Select.Item value='totalTimeUse&&false'>
+                    time range descending
+                  </Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </div>
           </div>
-          <div>
-            <Text
-              color='gray'
-              size='1'
-              className='flex items-center gap-2 mt-4'
-            >
-              <Skeleton loading={loading.getTaskLoading}>
+          <Spinner loading={loading.getTaskLoading}>
+            <div>
+              <Text
+                color='gray'
+                size='1'
+                className='flex items-center gap-2 mt-4'
+              >
                 <ActivityLogIcon />
                 {isSearch ? todaySearchResultTasks.length : todayTasks.length}
                 &nbsp;Tasks
-              </Skeleton>
-            </Text>
-          </div>
-          <ScrollArea
-            type='hover'
-            scrollbars='vertical'
-            className='max-h-[280px]'
-          >
-            <div className='flex flex-col gap-3'>
-              {(isSearch ? todaySearchResultTasks : todayTasks).map((task) => (
-                <Skeleton loading={loading.createTaskLoading} key={task.taskId}>
-                  <Card
-                    variant='classic'
-                    className='hover:border-brand border border-transparent'
-                  >
-                    <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
-                      <div className='flex gap-4 items-center justify-between'>
-                        <div className='flex gap-4 items-center'>
-                          <Spinner
-                            loading={
-                              taskClicked === task.taskId
-                                ? loading.editTaskLoading
-                                : false
-                            }
-                          >
-                            <Checkbox
-                              size='3'
-                              checked={task.isCompleted}
-                              onClick={handleTaskCardClick(
-                                task.taskId ? task.taskId : '',
-                                task.isCompleted ? task.isCompleted : false,
-                              )}
-                            />
-                          </Spinner>
+              </Text>
+            </div>
+            <ScrollArea
+              type='hover'
+              scrollbars='vertical'
+              className='max-h-[280px]'
+            >
+              <div className='flex flex-col gap-3'>
+                {(isSearch ? todaySearchResultTasks : todayTasks).map(
+                  (task) => (
+                    <Card
+                      key={task.taskId}
+                      variant='classic'
+                      className='hover:border-brand border border-transparent'
+                    >
+                      <div className='flex flex-col justify-between tablet:flex-row tablet:items-center gap-4'>
+                        <div className='flex gap-4 items-center justify-between'>
+                          <div className='flex gap-4 items-center'>
+                            <Spinner
+                              loading={
+                                taskClicked === task.taskId
+                                  ? loading.editTaskLoading
+                                  : false
+                              }
+                            >
+                              <Checkbox
+                                size='3'
+                                checked={task.isCompleted}
+                                onClick={handleTaskCardClick(
+                                  task.taskId ? task.taskId : '',
+                                  task.isCompleted ? task.isCompleted : false,
+                                )}
+                              />
+                            </Spinner>
 
-                          <div className='flex flex-col'>
-                            <Text
-                              as='div'
-                              size='2'
-                              weight='bold'
-                              className={`${task.isCompleted && 'text-brand line-through'} short-text-ellipsis`}
-                            >
-                              {task.desc}
-                            </Text>
-                            <Text
-                              className='flex gap-2'
-                              as='div'
-                              color='gray'
-                              size='1'
-                            >
-                              {dayjs(task.scheduledStartTime).format('LT')}-
-                              {dayjs(task.scheduledEndTime).format('LT')}
-                            </Text>
+                            <div className='flex flex-col'>
+                              <Text
+                                as='div'
+                                size='2'
+                                weight='bold'
+                                className={`${task.isCompleted && 'text-brand line-through'} short-text-ellipsis`}
+                              >
+                                {task.desc}
+                              </Text>
+                              <Text
+                                className='flex gap-2'
+                                as='div'
+                                color='gray'
+                                size='1'
+                              >
+                                {dayjs(task.scheduledStartTime).format('LT')}-
+                                {dayjs(task.scheduledEndTime).format('LT')}
+                              </Text>
+                            </div>
                           </div>
-                        </div>
-                        <div className='flex gap-2 tablet:hidden'>
-                          <IconButton
-                            variant='soft'
-                            size={'1'}
-                            onClick={handleTaskEditClick(task)}
-                          >
-                            <Pencil1Icon />
-                          </IconButton>
-                          <IconButton
-                            variant='outline'
-                            size={'1'}
-                            onClick={handleTaskDeleteClick(
-                              task.taskId ? task.taskId : '',
-                            )}
-                          >
-                            <Cross2Icon />
-                          </IconButton>
-                        </div>
-                      </div>
-                      <div className='flex gap-6 items-center'>
-                        <div className='flex gap-2 items-center'>
-                          <MyBadge label={task.label} variant={'soft'}>
-                            &nbsp;&nbsp;{task.label}&nbsp;&nbsp;
-                          </MyBadge>
-                          <Text
-                            color='indigo'
-                            size='1'
-                            className='flex items-center gap-1'
-                          >
-                            <Flex>
-                              {renderIcons(
-                                severitys[task.severity as SeverityLevel],
-                              )}
-                            </Flex>
-                            {task.severity.toUpperCase()}
-                          </Text>
-                        </div>
-                        <div className=' hidden tablet:flex gap-2'>
-                          <IconButton
-                            variant='soft'
-                            size={'1'}
-                            onClick={handleTaskEditClick(task)}
-                          >
-                            <Pencil1Icon />
-                          </IconButton>
-                          <Spinner
-                            loading={
-                              taskClicked === task.taskId
-                                ? loading.deleteTaskLoading
-                                : false
-                            }
-                          >
+                          <div className='flex gap-2 tablet:hidden'>
+                            <IconButton
+                              variant='soft'
+                              size={'1'}
+                              onClick={handleTaskEditClick(task)}
+                            >
+                              <Pencil1Icon />
+                            </IconButton>
                             <IconButton
                               variant='outline'
                               size={'1'}
-                              onClick={handleTaskDeleteClick(task.taskId)}
+                              onClick={handleTaskDeleteClick(
+                                task.taskId ? task.taskId : '',
+                              )}
                             >
                               <Cross2Icon />
                             </IconButton>
-                          </Spinner>
+                          </div>
+                        </div>
+                        <div className='flex gap-6 items-center'>
+                          <div className='flex gap-2 items-center'>
+                            <MyBadge label={task.label} variant={'soft'}>
+                              &nbsp;&nbsp;{task.label}&nbsp;&nbsp;
+                            </MyBadge>
+                            <Text
+                              color='indigo'
+                              size='1'
+                              className='flex items-center gap-1'
+                            >
+                              <Flex>
+                                {renderIcons(
+                                  severitys[task.severity as SeverityLevel],
+                                )}
+                              </Flex>
+                              {task.severity.toUpperCase()}
+                            </Text>
+                          </div>
+                          <div className=' hidden tablet:flex gap-2'>
+                            <IconButton
+                              variant='soft'
+                              size={'1'}
+                              onClick={handleTaskEditClick(task)}
+                            >
+                              <Pencil1Icon />
+                            </IconButton>
+                            <Spinner
+                              loading={
+                                taskClicked === task.taskId
+                                  ? loading.deleteTaskLoading
+                                  : false
+                              }
+                            >
+                              <IconButton
+                                variant='outline'
+                                size={'1'}
+                                onClick={handleTaskDeleteClick(task.taskId)}
+                              >
+                                <Cross2Icon />
+                              </IconButton>
+                            </Spinner>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                </Skeleton>
-              ))}
-            </div>
-          </ScrollArea>
-          <Skeleton loading={loading.getTaskLoading}>
+                    </Card>
+                  ),
+                )}
+              </div>
+            </ScrollArea>
             <Link href='#' onClick={() => dispatch(showTaskPanel(null))}>
               <Text className='flex gap-2 items-center'>
                 <AddCircleIcon />
                 Add Tasks
               </Text>
             </Link>
-          </Skeleton>
+          </Spinner>
         </div>
         {todayTasks && todayTasks.length === 0 && !loading.getTaskLoading && (
           <div className='flex flex-col gap-6 justify-center items-center'>
