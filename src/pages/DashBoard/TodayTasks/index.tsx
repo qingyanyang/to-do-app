@@ -30,16 +30,27 @@ import {
   getTodayTasksAsync,
   showTaskPanel,
   getTodaySearchResultTasks,
-  type SearchMethod,
   editTaskAsync,
   daleteTaskByTaskIdAsync,
-  Task,
 } from '../../../store/modules/taskSlice';
 import { useEffect, useState } from 'react';
 import MyBadge from '../../../components/MyBadge';
-import { renderIcons, severitys, type SeverityLevel } from '../TaskPanel';
+import { renderIcons } from '../TaskPanel';
+import {
+  severitys,
+  type SeverityLevel,
+  type SearchMethod,
+  Task,
+} from '../../../util/constants';
 
 function TodayTasks() {
+  dayjs.extend(LocalizedFormat);
+  const formattedDate = dayjs().format('LL');
+
+  const dispatch = useAppDispatch();
+  const { loading, todayTasks, todayTasksComplete, todaySearchResultTasks } =
+    useAppSelector((state) => state.task);
+
   const [selectedLevel, setSelectedLevel] = useState<null | string>(null);
   const [selectedLabel, setSelectedLabel] = useState<null | string>(null);
   const [selectedCompletence, setSelectedCompletence] = useState<null | string>(
@@ -51,27 +62,6 @@ function TodayTasks() {
   const [searchContent, setSearchContent] = useState('');
   const [isSearch, setIsSearch] = useState(false);
   const [taskClicked, setTaskClicked] = useState('');
-
-  dayjs.extend(LocalizedFormat);
-  const formattedDate = dayjs().format('LL');
-
-  const dispatch = useAppDispatch();
-  const {
-    loading,
-    todayTasks,
-    todayTasksComplete,
-    todaySearchResultTasks,
-    editTaskContent,
-  } = useAppSelector((state) => state.task);
-  /**
-   * const { searchedName, filterMethod, sortMethod } = action.payload;
-      const { severity, label, isCompleted } = filterMethod;
-      const { way, atz } = sortMethod;
-      atz boolean 
-      scheduledStartTime
-      totalTimeUse
-   * 
-   */
 
   const getSearchedFormat = (
     newContent: string,
@@ -208,10 +198,6 @@ function TodayTasks() {
   const handleTaskEditClick = (task: Task) => {
     return () => {
       dispatch(showTaskPanel(task));
-      console.log('task');
-      console.log(task);
-      console.log('editTaskContent');
-      console.log(editTaskContent);
     };
   };
 
@@ -221,18 +207,6 @@ function TodayTasks() {
       dispatch(daleteTaskByTaskIdAsync(taskId, new Date()));
     };
   };
-  /**
-   * fetch data from server and update states together:
-   */
-  // tasks: get data only initial time then initialize state
-  // labels: get data only initial time then initialize state
-  // delete/update: call update api then update state
-
-  /**
-   * manipulate state without fetching data, dynamically get:
-   */
-  // filter by [level, label, done]
-  // sort by [ z-a, a-z ][ level, createtime, datetime scheduled]
 
   useEffect(() => {
     // get tasks

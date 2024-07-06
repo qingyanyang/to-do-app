@@ -1,49 +1,90 @@
-export enum MyChipSize {
-  Small = 'small',
-  Normal = 'normal',
-  Large = 'large',
+import { Timestamp } from 'firebase/firestore';
+
+export type SeverityLevel = 'Low' | 'Moderate' | 'Critical' | 'Urgent';
+
+export interface Task {
+  taskId: string;
+  desc: string;
+  label: string;
+  severity: string;
+  scheduledStartTime: Date;
+  scheduledEndTime: Date;
+  scheduledStartDate?: Date;
+  scheduledEndDate?: Date;
+  isCompleted?: boolean;
+  isExpired?: boolean;
 }
 
-export enum MyColor {
-  Success = 'success',
-  Brand = 'brand',
-  Error = 'error',
-  Warning = 'warning',
-  Neutral = 'neutral',
+export interface FirebaseStampTask {
+  taskId: string;
+  desc: string;
+  label: string;
+  severity: string;
+  scheduledStartTime: Timestamp;
+  scheduledEndTime: Timestamp;
+  isCompleted: boolean;
+  isExpired: boolean;
 }
 
-interface ColorConfig {
-  borderColor: string;
-  bgColor: string;
-  textColor: string;
-}
-
-const colorMap: Record<MyColor, ColorConfig> = {
-  [MyColor.Success]: {
-    borderColor: '#bbf7d0',
-    bgColor: '#f0fdf4',
-    textColor: '#15803d',
-  },
-  [MyColor.Brand]: {
-    borderColor: '#c7d2fe',
-    bgColor: '#eff1fc',
-    textColor: '#4338ca',
-  },
-  [MyColor.Error]: {
-    borderColor: '#fecaca',
-    bgColor: '#fcf2f2',
-    textColor: '#dc2626',
-  },
-  [MyColor.Warning]: {
-    borderColor: '#fde68a',
-    bgColor: '#fffbeb',
-    textColor: '#a16207',
-  },
-  [MyColor.Neutral]: {
-    borderColor: '#e5e5e5',
-    bgColor: '#f9fafb',
-    textColor: '#525154',
-  },
+export type SearchMethod = {
+  searchedName: string;
+  filterMethod: {
+    severity: string | null;
+    label: string | null;
+    isCompleted: boolean | null;
+  };
+  sortMethod: { way: string; atz: boolean }; // default value: 'scheduledTime true'
 };
 
-export { colorMap };
+export type LoadingKey =
+  | 'getTaskLoading'
+  | 'createTaskLoading'
+  | 'editTaskLoading'
+  | 'deleteTaskLoading'
+  | 'editTaskContentLoading';
+export interface TaskState {
+  taskPanelVisible: boolean;
+  todayTasks: Task[];
+  todaySearchResultTasks: Task[];
+  todayTasksComplete: { total: number; completedNum: number };
+  editTaskContent: Task | null;
+  loading: {
+    getTaskLoading: boolean;
+    createTaskLoading: boolean;
+    editTaskLoading: boolean;
+    deleteTaskLoading: boolean;
+    editTaskContentLoading: boolean;
+  };
+  error: string | null;
+  success: string | null;
+}
+
+export const labels = [
+  { name: 'study', color: 'indigo', index: 0 },
+  { name: 'work', color: 'cyan', index: 1 },
+  { name: 'health', color: 'orange', index: 2 },
+  { name: 'dating', color: 'crimson', index: 3 },
+  { name: 'entertainment', color: 'yellow', index: 4 },
+];
+
+export const mapLabelToIndex = (searchName: string): number => {
+  let resIndex = 0;
+  labels.forEach((label) => {
+    if (label.name === searchName) {
+      resIndex = label.index;
+    }
+  });
+  return resIndex;
+};
+
+export const severitys: Record<SeverityLevel, number> = {
+  Low: 1,
+  Moderate: 2,
+  Critical: 3,
+  Urgent: 4,
+};
+
+export const severitysArr = Object.entries(severitys).map(([name, amount]) => ({
+  name,
+  amount,
+}));

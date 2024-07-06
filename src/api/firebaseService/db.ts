@@ -1,4 +1,4 @@
-import { FirebaseStampTask } from '../../store/modules/taskSlice';
+import { FirebaseStampTask } from '../../util/constants';
 import { db } from '../../FirebaseConfig';
 
 import {

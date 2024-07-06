@@ -9,7 +9,7 @@ import { Popover } from 'antd';
 import { useState } from 'react';
 
 const getListData = (value: Dayjs) => {
-  let listData: { type: string; content: string }[] = []; // Specify the type of listData
+  let listData: { type: string; content: string }[] = [];
   switch (value.date()) {
     case 8:
       listData = [

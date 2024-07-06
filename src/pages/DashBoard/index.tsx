@@ -31,6 +31,7 @@ const navMenu = [
     label: '...',
     path: 'calender',
   },
+  /*todo: will implement this feature next sprint*/
   // {
   //   icon: <TokensIcon />,
   //   label: 'Settings',
@@ -39,13 +40,13 @@ const navMenu = [
 ];
 
 function DashBoard() {
-  const [showNavBar, setShowNavBar] = useState(false);
-  const [navMenuIndex, setNavMenuIndex] = useState(0); // 0: todays; 1: calender; 2: settings
-
   const { taskPanelVisible } = useAppSelector((state) => state.task);
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
+
+  const [showNavBar, setShowNavBar] = useState(false);
+  const [navMenuIndex, setNavMenuIndex] = useState(0); // 0: todays; 1: calender; 2: settings
 
   const handleNavMenuSwitch = (index: number) => {
     setNavMenuIndex(index);

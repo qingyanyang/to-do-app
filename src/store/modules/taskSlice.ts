@@ -9,77 +9,12 @@ import dayjs from 'dayjs';
 import { FirebaseFirestoreService } from '../../api/firebaseService/db';
 import { getUID } from '../../util/localStorageFucs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import { Timestamp } from 'firebase/firestore';
-
-// interface Task {
-//   desc: string;
-//   label: string;
-//   severity: string;
-//   scheduledStartTime: Dayjs;
-//   scheduledEndTime: Dayjs;
-//   scheduledStartDate?: Dayjs;
-//   scheduledEndDate?: Dayjs;
-//   isCompleted?: boolean;
-//   isExpired?: boolean;
-// }
-
-// create
-export interface Task {
-  taskId: string;
-  desc: string;
-  label: string;
-  severity: string;
-  scheduledStartTime: Date;
-  scheduledEndTime: Date;
-  scheduledStartDate?: Date;
-  scheduledEndDate?: Date;
-  isCompleted?: boolean;
-  isExpired?: boolean;
-}
-
-export interface FirebaseStampTask {
-  taskId: string;
-  desc: string;
-  label: string;
-  severity: string;
-  scheduledStartTime: Timestamp;
-  scheduledEndTime: Timestamp;
-  isCompleted: boolean;
-  isExpired: boolean;
-}
-
-export type SearchMethod = {
-  searchedName: string;
-  filterMethod: {
-    severity: string | null;
-    label: string | null;
-    isCompleted: boolean | null;
-  };
-  sortMethod: { way: string; atz: boolean }; // default value: 'scheduledTime true'
-};
-
-export type LoadingKey =
-  | 'getTaskLoading'
-  | 'createTaskLoading'
-  | 'editTaskLoading'
-  | 'deleteTaskLoading'
-  | 'editTaskContentLoading';
-interface TaskState {
-  taskPanelVisible: boolean;
-  todayTasks: Task[];
-  todaySearchResultTasks: Task[];
-  todayTasksComplete: { total: number; completedNum: number }; // query this by month and year
-  editTaskContent: Task | null;
-  loading: {
-    getTaskLoading: boolean;
-    createTaskLoading: boolean;
-    editTaskLoading: boolean;
-    deleteTaskLoading: boolean;
-    editTaskContentLoading: boolean;
-  };
-  error: string | null;
-  success: string | null;
-}
+import {
+  LoadingKey,
+  SearchMethod,
+  Task,
+  TaskState,
+} from '../../util/constants';
 
 const initialState: TaskState = {
   taskPanelVisible: false,
@@ -219,10 +154,6 @@ export const taskSlice = createSlice({
         };
       }
     },
-    // // get date tasks list by month
-    // getMonthTasks: (state, action: PayloadAction<MonthTask[]>) => {
-    //   state.monthTasks = action.payload;
-    // },
     // loading
     setLoading: (
       state,
@@ -378,7 +309,6 @@ export const getTodayTasksAsync =
       const dailyTasksForToday =
         await FirebaseFirestoreService.getDocumentsFromLastCollection(path);
 
-      console.log(dailyTasksForToday);
       dispatch(setLoading({ attribute: 'getTaskLoading', value: false }));
       // when editing a task, can only edit des,label,servirty,starttime and endtime
       if (dailyTasksForToday) {

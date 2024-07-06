@@ -15,7 +15,6 @@ import {
   Spinner,
   AlertDialog,
 } from '@radix-ui/themes';
-
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
@@ -29,36 +28,7 @@ import {
   validateTaskDesc,
 } from '../../../util/validations';
 import MyBadge from '../../../components/MyBadge';
-
-export type SeverityLevel = 'Low' | 'Moderate' | 'Critical' | 'Urgent';
-
-export const labels = [
-  { name: 'study', color: 'indigo', index: 0 },
-  { name: 'work', color: 'cyan', index: 1 },
-  { name: 'health', color: 'orange', index: 2 },
-  { name: 'dating', color: 'crimson', index: 3 },
-  { name: 'entertainment', color: 'yellow', index: 4 },
-];
-
-const mapLabelToIndex = (searchName: string): number => {
-  let resIndex = 0;
-  labels.forEach((label) => {
-    if (label.name === searchName) {
-      resIndex = label.index;
-    }
-  });
-  return resIndex;
-};
-export const severitys: Record<SeverityLevel, number> = {
-  Low: 1,
-  Moderate: 2,
-  Critical: 3,
-  Urgent: 4,
-};
-const severitysArr = Object.entries(severitys).map(([name, amount]) => ({
-  name,
-  amount,
-}));
+import { labels, mapLabelToIndex, severitysArr } from '../../../util/constants';
 
 export const renderIcons = (amount: number) => {
   return Array.from({ length: amount }, (_, index) => (
@@ -69,12 +39,9 @@ export const renderIcons = (amount: number) => {
 const TaskPanel = () => {
   // Get today's date
   const today = dayjs();
-  // Calculate the max date as 7 days from today
   const maxDate = today.add(7, 'day');
-
   const dispatch = useAppDispatch();
   const { loading, editTaskContent } = useAppSelector((state) => state.task);
-
   const [desc, setDesc] = useState('');
   const [counter, setCounter] = useState(0);
   const [startScheduleTime, setStartScheduleTime] = useState(today);
@@ -88,7 +55,7 @@ const TaskPanel = () => {
   const [dateErrorMsg, setDateErrorMsg] = useState('');
   const [timeExpired, setTimeExpired] = useState(false);
 
-  const onSuccess = () => {
+  const revertState = () => {
     setDesc('');
     setCounter(0);
     setStartScheduleTime(today);
@@ -100,14 +67,6 @@ const TaskPanel = () => {
   };
 
   const handleCreateTask = () => {
-    // console.log(desc);
-    // console.log(startScheduleTime);
-    // console.log(endScheduleTime);
-    // console.log(startScheduleDate);
-    // console.log(endScheduleDate);
-    // console.log(selectedSeverityValue);
-    // console.log(labels[selectedLabelValue].name);
-
     const newDescErrorMsg = validateTaskDesc(desc);
     setDescErrorMsg(newDescErrorMsg);
 
@@ -131,7 +90,7 @@ const TaskPanel = () => {
               scheduledStartDate: startScheduleDate.toDate(),
               scheduledEndDate: endScheduleDate.toDate(),
             },
-            onSuccess,
+            revertState,
           ),
         );
       }
@@ -139,12 +98,6 @@ const TaskPanel = () => {
   };
 
   const handleEditTask = () => {
-    // console.log(desc);
-    // console.log(startScheduleTime);
-    // console.log(endScheduleTime);
-    // console.log(selectedSeverityValue);
-    // console.log(labels[selectedLabelValue].name);
-
     const newDescErrorMsg = validateTaskDesc(desc);
     setDescErrorMsg(newDescErrorMsg);
 
@@ -248,7 +201,7 @@ const TaskPanel = () => {
       setSelectedSeverityValue(editTaskContent.severity);
       setSelectedLabelValue(mapLabelToIndex(editTaskContent.label));
     } else {
-      onSuccess();
+      revertState();
     }
   }, [editTaskContent]);
 
