@@ -77,17 +77,7 @@ const deleteDocumentByDocumentName = async (
 ) => {
   return await deleteDoc(doc(db, fromCollection, documentName));
 };
-/**
- * 
- * 
-month:"07",
-  data:[
-  {day:"01",dailyTasks:[{...},{...},{...}]}, // some date might not exists
-  {day:"18",dailyTasks:[{...},{...},{...}]},
-  ]
-}
- *
- */
+
 const getDocumentsFromCollection = async (path: string) => {
   const monthData = {
     month: path.split('/').pop(), // Extract month from path
