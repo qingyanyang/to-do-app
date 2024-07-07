@@ -74,10 +74,10 @@ function DashBoard() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className='h-0 w-full relative'>
+      <div className='bg-[#121212] h-full w-full relative'>
         {/* top nav bar */}
         {showNavBar && (
-          <div className='backdrop-blur-lg w-full h-full fixed z-10'></div>
+          <div className=' backdrop-blur-lg w-full h-full fixed z-10'></div>
         )}
         <div
           className={`block border-b-[1px] border-neutral tablet:hidden w-screen h-[10vh] fixed ${!taskPanelVisible && 'z-20'} backdrop-blur-lg`}
@@ -176,7 +176,7 @@ function DashBoard() {
             </div>
           </div>
         </div>
-        <Flex className='gap-5 h-full tablet:ml-[250px] p-4 relative top-[80px] tablet:top-0'>
+        <Flex className=' gap-5 h-full tablet:ml-[250px] p-4 relative top-[80px] tablet:top-0'>
           <div className='flex-1 mt-4 h-full w-full tablet:mt-9'>
             <Outlet />
           </div>
