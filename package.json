@@ -75,5 +75,13 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "cssnano": {
+    "preset": [
+      "default",
+      {
+        "calc": false
+      }
+    ]
   }
 }
