@@ -246,7 +246,7 @@ const TaskPanel = () => {
                 </div>
               </div>
               <div className='flex flex-col gap-2'>
-                <Heading size='3'>Time Schedule</Heading>
+                <Heading size='3'>Time Schedule *</Heading>
                 <SingleInputTimeRangeField
                   sx={{
                     input: { color: '#7f838b', borderColor: 'white' },

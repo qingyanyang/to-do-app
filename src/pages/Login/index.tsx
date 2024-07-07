@@ -27,6 +27,11 @@ import {
   setUserEmail,
 } from '../../util/localStorageFucs';
 
+import { useAppDispatch } from '../../store/hooks';
+import { setError, setSuccess } from '../../store/modules/taskSlice';
+import { FirebaseError } from 'firebase/app';
+import { errorMSGMapping } from '../../util/constants';
+
 interface TodoInputProps {
   label: string;
   instruction?: ReactNode;
@@ -90,6 +95,8 @@ export const TodoInput: React.FC<TodoInputProps> = ({
 };
 
 function Login() {
+  const dispatch = useAppDispatch();
+
   const [page, setPage] = useState(0); //0:signin; 1:reset pw; 2: signup
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [email, setEmail] = useState('');
@@ -121,6 +128,8 @@ function Login() {
     //validations
     if (!emailErrorMSG && !passwordErrorMSG) {
       try {
+        dispatch(setError(null));
+        dispatch(setSuccess(null));
         const res = await FirebaseAuthService.loginUser(email, password);
         setEmail('');
         setPassword('');
@@ -132,14 +141,19 @@ function Login() {
         setProfileURL(res.user.photoURL);
         // redirect
         navigate('/');
-      } catch (error) {
-        alert(error);
+        dispatch(setSuccess('Login successfully!'));
+      } catch (error: unknown) {
+        if (error instanceof FirebaseError) {
+          dispatch(setError(errorMSGMapping(error.code)));
+        }
       }
     }
   };
 
   const handleLoginWithGoogle = async () => {
     try {
+      dispatch(setError(null));
+      dispatch(setSuccess(null));
       const res = await FirebaseAuthService.loginWithGoogle();
       // save info
       const accessToken = await res.user.getIdToken();
@@ -149,8 +163,11 @@ function Login() {
       setProfileURL(res.user.photoURL);
       // redirect
       navigate('/');
-    } catch (error) {
-      alert(error);
+      dispatch(setSuccess('Login successfully!'));
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        dispatch(setError(errorMSGMapping(error.code)));
+      }
     }
   };
 
@@ -229,6 +246,7 @@ type SignUpProps = {
   handleSwitch: (pageNumber: number) => void;
 };
 const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
+  const dispatch = useAppDispatch();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
@@ -268,7 +286,8 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
         const userEmail = res.user.email;
         const uid = res.user.uid;
         const photoURL = res.user.photoURL;
-
+        dispatch(setError(null));
+        dispatch(setSuccess(null));
         // create user document
         await FirebaseFirestoreService.createDocumentWithName(
           'users',
@@ -279,13 +298,15 @@ const SignUp: React.FC<SignUpProps> = ({ handleSwitch }) => {
           },
           uid,
         );
-
+        dispatch(setSuccess('Create account successfully!'));
         setEmail('');
         setPassword('');
         setConfirmPassword('');
         handleSwitch(0);
-      } catch (error) {
-        alert(error);
+      } catch (error: unknown) {
+        if (error instanceof FirebaseError) {
+          dispatch(setError(errorMSGMapping(error.code)));
+        }
       }
     }
   };
@@ -375,6 +396,7 @@ type ResetPasswordProps = {
 };
 
 const ResetPassword: React.FC<ResetPasswordProps> = ({ handleSwitch }) => {
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState('');
   const [emailErrorMSG, setEmailErrorMSG] = useState('');
 
@@ -388,12 +410,15 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ handleSwitch }) => {
     const emailErrorMSG = handleValidateEmail();
     //validations
     if (!emailErrorMSG) {
-      console.log('handleResetPassword');
       try {
+        dispatch(setError(null));
+        dispatch(setSuccess(null));
         await FirebaseAuthService.sendResetEmail(email);
-        alert('sent the password reset email!');
-      } catch (error) {
-        alert(error);
+        dispatch(setSuccess('Sent the password reset email!'));
+      } catch (error: unknown) {
+        if (error instanceof FirebaseError) {
+          dispatch(setError(errorMSGMapping(error.code)));
+        }
       }
     }
   };

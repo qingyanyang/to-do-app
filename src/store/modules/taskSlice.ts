@@ -10,11 +10,13 @@ import { FirebaseFirestoreService } from '../../api/firebaseService/db';
 import { getUID } from '../../util/localStorageFucs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import {
+  errorMSGMapping,
   LoadingKey,
   SearchMethod,
   Task,
   TaskState,
 } from '../../util/constants';
+import { FirebaseError } from 'firebase/app';
 
 const initialState: TaskState = {
   taskPanelVisible: false,
@@ -283,9 +285,9 @@ export const createTaskAsync =
     } catch (error) {
       // Dispatch error state
       dispatch(setLoading({ attribute: 'createTaskLoading', value: false }));
-      dispatch(
-        setError(error instanceof Error ? error.message : 'Unknown error'),
-      );
+      if (error instanceof FirebaseError) {
+        dispatch(setError(errorMSGMapping(error.code)));
+      }
       dispatch(setSuccess(null));
     }
   };
@@ -329,9 +331,9 @@ export const getTodayTasksAsync =
       }
     } catch (error) {
       dispatch(setLoading({ attribute: 'getTaskLoading', value: false }));
-      dispatch(
-        setError(error instanceof Error ? error.message : 'Unknown error'),
-      );
+      if (error instanceof FirebaseError) {
+        dispatch(setError(errorMSGMapping(error.code)));
+      }
       dispatch(setSuccess(null));
     }
   };
@@ -429,9 +431,9 @@ export const editTaskAsync =
           value: false,
         }),
       );
-      dispatch(
-        setError(error instanceof Error ? error.message : 'Unknown error'),
-      );
+      if (error instanceof FirebaseError) {
+        dispatch(setError(errorMSGMapping(error.code)));
+      }
       dispatch(setSuccess(null));
     }
   };
@@ -503,9 +505,9 @@ export const daleteTaskByTaskIdAsync =
           value: false,
         }),
       );
-      dispatch(
-        setError(error instanceof Error ? error.message : 'Unknown error'),
-      );
+      if (error instanceof FirebaseError) {
+        dispatch(setError(errorMSGMapping(error.code)));
+      }
       dispatch(setSuccess(null));
     }
   };

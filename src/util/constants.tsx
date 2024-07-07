@@ -88,3 +88,30 @@ export const severitysArr = Object.entries(severitys).map(([name, amount]) => ({
   name,
   amount,
 }));
+
+export const errorMSGMapping = (errCode: string) => {
+  let errorMessage = '';
+  switch (errCode) {
+    case 'auth/invalid-credential':
+      errorMessage = 'Your email or password is wrong.';
+      break;
+    case 'auth/insufficient-permission':
+      errorMessage = 'Session expired. Please relogin.';
+      break;
+    case 'auth/id-token-expired':
+      errorMessage = 'Session expired. Please relogin.';
+      break;
+    case 'auth/email-already-exists':
+      errorMessage = 'User already exists.';
+      break;
+    case 'auth/too-many-requests':
+      errorMessage = 'Too many requests. Try again later.';
+      break;
+    case 'auth/internal-error':
+      errorMessage = 'Server is scrashing...';
+      break;
+    default:
+      errorMessage = 'An unknown Error happened.';
+  }
+  return errorMessage;
+};
