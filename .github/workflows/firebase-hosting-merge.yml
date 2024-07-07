@@ -20,7 +20,8 @@ jobs:
       REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
     steps:
       - uses: actions/checkout@v4
-      - run: yarn install & yarn build
+      - run: yarn install
+      - run: yarn build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
