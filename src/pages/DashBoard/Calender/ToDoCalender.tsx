@@ -51,7 +51,7 @@ const ToDoCalender: React.FC = () => {
     return num ? (
       <div className='notes-month'>
         <section>{num}</section>
-        <span>Backlog number</span>
+        <span>Back log number</span>
       </div>
     ) : null;
   };
